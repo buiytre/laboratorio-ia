@@ -13,6 +13,7 @@ public class Estat {
 	//Parte dinamica
 	private Asignacion[] mServersPeticiones = null;
 	private int[] mPeticionesServer = null; 
+	private int nPeticiones = 0;
 	
 	public Estat(int nServers, int nReplications, int nUsers, int nRequestsUser, int seed) {
 		// TODO Auto-generated constructor stub
@@ -24,7 +25,14 @@ public class Estat {
 		}
 		sRequests = new Requests(nUsers, nRequestsUser, seed);
 		mServersPeticiones = new Asignacion[nServers];
-		mPeticionesServer = new int[sRequests.size()];
+		nPeticiones = sRequests.size();
+		mPeticionesServer = new int[nPeticiones];
+		for (int i=0; i< nPeticiones; ++i){
+			mPeticionesServer[i] = -1;
+		}
+		
+		//ESTADO INICIAL "FINAL VALIDO"
+		
 	}
 	
 	public void prueba(){
