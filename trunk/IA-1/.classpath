@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/pistachin/Desktop/AIMA/dist/AIMA.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/pistachin/Desktop/DistribFileSystem/dist/DistribFileSystem.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Documents and Settings/alejandro.polo/Mis documentos/Baixades/DistribFileSystem/dist/DistribFileSystem.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Documents and Settings/alejandro.polo/Mis documentos/Baixades/AIMA/dist/AIMA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
