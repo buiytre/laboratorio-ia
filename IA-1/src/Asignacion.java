@@ -1,9 +1,14 @@
 import java.util.ArrayList;
 
 
-public class Assignacion {
+public class Asignacion {
 	private int mTiempoTotal;
 	private ArrayList<Integer> mRequests;
+	
+	public Asignacion(){
+		mRequests = new ArrayList<Integer>();
+		mTiempoTotal = 0;		
+	}
 	
 	public void addAsignacion(int idRequest, int tiempo) {
 		mRequests.add(idRequest);
