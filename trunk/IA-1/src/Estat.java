@@ -6,12 +6,13 @@ public class Estat {
 	
 	
 	//Parte estatica
-	public static Servers sServers = null;
-	public static Requests sRequests = null;
+	private static Servers sServers = null;
+	private static Requests sRequests = null;
 	
 	
 	//Parte dinamica
-	public ArrayList<> ServersPeticiones
+	private Asignacion[] mServersPeticiones = null;
+	private int[] mPeticionesServer = null; 
 	
 	public Estat(int nServers, int nReplications, int nUsers, int nRequestsUser, int seed) {
 		// TODO Auto-generated constructor stub
@@ -22,17 +23,16 @@ public class Estat {
 			e.printStackTrace();
 		}
 		sRequests = new Requests(nUsers, nRequestsUser, seed);
+		mServersPeticiones = new Asignacion[nServers];
+		mPeticionesServer = new int[sRequests.size()];
 	}
 	
-	public void comprovar(){
-		System.out.println(sServers.tranmissionTime(2, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));
-		System.out.println(sServers.tranmissionTime(1, 1));		
+	public void prueba(){
+		for (int i=0; i < sRequests.size(); ++i){
+			System.out.println(sRequests.getRequest(i)[0]);
+		}
 	}
+		
+
 
 }
