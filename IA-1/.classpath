@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="E:/Documents and Settings/alejandro.polo/Mis documentos/Baixades/AIMA/dist/AIMA.jar"/>
 	<classpathentry kind="lib" path="E:/Documents and Settings/alejandro.polo/Mis documentos/Baixades/DistribFileSystem/dist/DistribFileSystem.jar"/>
 	<classpathentry kind="lib" path="E:/Documents and Settings/alejandro.polo/Mis documentos/Baixades/AIMA/dist/lib"/>
+	<classpathentry kind="lib" path="C:/Users/pistachin/Desktop/AIMA/dist/AIMA.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pistachin/Desktop/DistribFileSystem/dist/DistribFileSystem.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
