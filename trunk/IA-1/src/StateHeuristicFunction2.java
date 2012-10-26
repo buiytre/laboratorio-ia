@@ -1,6 +1,6 @@
 import aima.search.framework.HeuristicFunction;
 
-public class StateHeuristicFunction2 implements aima.search.framework.HeuristicFunction{
+public class StateHeuristicFunction2 implements HeuristicFunction{
 
 	@Override
 	public double getHeuristicValue(Object arg0) {
