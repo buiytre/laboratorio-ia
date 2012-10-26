@@ -10,6 +10,11 @@ public class Link {
 		mTotalTime = 0;		
 	}
 	
+	public Link(Link oldLink){
+		this.mTotalTime = oldLink.mTotalTime;
+		this.mRequests = new ArrayList<Integer>(oldLink.mRequests); 
+	}
+	
 	public void addLink(int idRequest, int time) {
 		mRequests.add(idRequest);
 		mTotalTime += time;

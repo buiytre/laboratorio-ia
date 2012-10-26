@@ -41,6 +41,18 @@ public class State {
 		sPenalization = penalization;
 	}
 
+	public State(State oldState){
+		mRequestsServers = oldState.mRequestsServers.clone();
+		for(int i = 0; i < mServersRequests.length ; ++i){
+			mServersRequests[i] = new Link(oldState.mServersRequests[i]);
+		}
+		
+	}
+	
+	public static int getServersCount(){
+		return sServersCount;
+	}
+	
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -65,6 +77,10 @@ public class State {
 		}
 	}
 
+	public int getServerTime(int idServer){
+		return mServersRequests[idServer].getTotalTime();		
+	}
+	
 	public void initialGreedyStateFullRequests() {
 		Set<Integer> serverSet;
 		int idFile = -1;
