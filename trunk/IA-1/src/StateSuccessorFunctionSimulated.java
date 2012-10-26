@@ -2,7 +2,7 @@ import java.util.List;
 
 import aima.search.framework.SuccessorFunction;
 
-public class EstatSuccessorFunctionHill implements aima.search.framework.SuccessorFunction{
+public class StateSuccessorFunctionSimulated implements aima.search.framework.SuccessorFunction{
 
 	@Override
 	public List getSuccessors(Object arg0) {
