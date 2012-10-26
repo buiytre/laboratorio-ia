@@ -8,7 +8,7 @@ public class Main {
 		//int nRequestsUser = 5;
 		int nRequestsUser = 4;
 		int seed = 10;
-		Estat estat = new Estat(nServers, nReplications, nUsers,nRequestsUser,seed);
-		estat.prueba();
+		State estat = new State(nServers, nReplications, nUsers,nRequestsUser,seed);
+		
 	}
 }
