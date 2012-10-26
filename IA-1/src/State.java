@@ -18,7 +18,7 @@ public class State {
 	private Link[] mServersRequests = null;
 	private int[] mRequestsServers = null;
 	private int mTotalTime = 0;
-	private int mTotalPenalization = 0;
+	private int mTotalPenalizationTime = 0;
 
 	public State(int nServers, int nReplications, int nUsers,
 			int nRequestsUser, int seed) {
@@ -41,7 +41,7 @@ public class State {
 			int nRequestsUser, int seed, int penalization) {
 		this(nServers, nReplications, nUsers, nRequestsUser, seed);
 		sPenalization = penalization;
-		mTotalPenalization = sRequestsCount * sPenalization; // Se cuenta por
+		mTotalPenalizationTime = sRequestsCount * sPenalization; // Se cuenta por
 																// defecto todas
 																// los links sin
 																// asignar,
@@ -63,9 +63,13 @@ public class State {
 	}
 
 	public int getAverage() {
-		return 0;
+		return (mTotalTime / sServersCount);
 	}
 
+	public int getTotalPenalizationTime(){
+		return mTotalPenalizationTime;
+	}
+	
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -210,7 +214,7 @@ public class State {
 				idServer, sRequests.getRequest(idRequest)[0]));
 		mTotalTime += sServers.tranmissionTime(idServer, sRequests
 				.getRequest(idRequest)[0]);
-		mTotalPenalization -= sPenalization;
+		mTotalPenalizationTime -= sPenalization;
 	}
 
 	public boolean canSwap(int idServer, int idRequest) {
@@ -236,7 +240,7 @@ public class State {
 						sRequests.getRequest(idRequest)[0]));
 		mTotalTime -= sServers.tranmissionTime(oldServer, sRequests
 				.getRequest(idRequest)[0]);
-		mTotalPenalization += sPenalization;
+		mTotalPenalizationTime += sPenalization;
 	}
 
 	public boolean canRemove(int idRequest) {
