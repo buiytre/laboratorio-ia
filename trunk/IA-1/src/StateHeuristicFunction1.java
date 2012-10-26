@@ -7,10 +7,10 @@ public class StateHeuristicFunction1 implements
 	public double getHeuristicValue(Object arg0) {
 		// TODO Auto-generated method stub
 		int maxTime = 0;
-		State oldState = new State((State) arg0);
+		State actualState = new State((State) arg0);
 		for (int i = 0; i < State.getServersCount(); ++i) {
-			if (maxTime <= oldState.getServerTime(i)) {
-				maxTime = oldState.getServerTime(i);
+			if (maxTime <= actualState.getServerTime(i)) {
+				maxTime = actualState.getServerTime(i);
 			}
 		}
 		return maxTime;
