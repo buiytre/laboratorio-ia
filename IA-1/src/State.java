@@ -12,11 +12,13 @@ public class State {
 	private static Requests sRequests = null;
 	private static int sRequestsCount = 0;
 	private static int sServersCount = 0;
-	private static int sPenalization = 5000;
+	private static int sPenalization = 0;
 
 	// Parte dinamica
 	private Link[] mServersRequests = null;
 	private int[] mRequestsServers = null;
+	private int mTotalTime = 0;
+	private int mTotalPenalization = 0;
 
 	public State(int nServers, int nReplications, int nUsers,
 			int nRequestsUser, int seed) {
@@ -39,20 +41,31 @@ public class State {
 			int nRequestsUser, int seed, int penalization) {
 		this(nServers, nReplications, nUsers, nRequestsUser, seed);
 		sPenalization = penalization;
+		mTotalPenalization = sRequestsCount * sPenalization; // Se cuenta por
+																// defecto todas
+																// los links sin
+																// asignar,
+																// sumamos
+																// penalizaciones
 	}
 
-	public State(State oldState){
-		mRequestsServers = oldState.mRequestsServers.clone();
-		for(int i = 0; i < mServersRequests.length ; ++i){
-			mServersRequests[i] = new Link(oldState.mServersRequests[i]);
+	public State(State oldState) {
+		this.mRequestsServers = oldState.mRequestsServers.clone();
+		for (int i = 0; i < mServersRequests.length; ++i) {
+			this.mServersRequests[i] = new Link(oldState.mServersRequests[i]);
 		}
-		
+		this.mTotalTime = oldState.mTotalTime;
+
 	}
-	
-	public static int getServersCount(){
+
+	public static int getServersCount() {
 		return sServersCount;
 	}
-	
+
+	public int getAverage() {
+		return 0;
+	}
+
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -77,10 +90,10 @@ public class State {
 		}
 	}
 
-	public int getServerTime(int idServer){
-		return mServersRequests[idServer].getTotalTime();		
+	public int getServerTime(int idServer) {
+		return mServersRequests[idServer].getTotalTime();
 	}
-	
+
 	public void initialGreedyStateFullRequests() {
 		Set<Integer> serverSet;
 		int idFile = -1;
@@ -97,7 +110,7 @@ public class State {
 			// Elegir el servidor con menos carga
 			it = serverSet.iterator();
 			idServer = it.next(); // it tendrá mínimo un servidor, los files
-									// tienen número mínimo de réplicas
+			// tienen número mínimo de réplicas
 			optimalTime = mServersRequests[idServer].getTotalTime()
 					+ sServers.tranmissionTime(idServer, sRequests
 							.getRequest(i)[0]);
@@ -133,7 +146,7 @@ public class State {
 
 			// Elegir aleatoriamente un servidor con el fichero
 			rnd = rndGr.nextInt(serverSet.size() + 1); // agregar caso sin
-														// servir
+			// servir
 			if (rnd < serverSet.size()) {
 				it = serverSet.iterator();
 				for (int j = 0; j <= rnd; ++j) {
@@ -162,7 +175,7 @@ public class State {
 			// Elegir el servidor con menos carga
 			it = serverSet.iterator();
 			idServer = it.next(); // it tendrá mínimo un servidor, los files
-									// tienen número mínimo de réplicas
+			// tienen número mínimo de réplicas
 			optimalTime = mServersRequests[idServer].getTotalTime()
 					+ sServers.tranmissionTime(idServer, sRequests
 							.getRequest(i)[0]);
@@ -177,7 +190,7 @@ public class State {
 									.getRequest(i)[0]);
 				}
 			}
-			
+
 			if (optimalTime <= mServersRequests[idServer].getTotalTime()
 					+ sPenalization) {
 				// Asignarle el fichero
@@ -188,7 +201,6 @@ public class State {
 	}
 
 	public void swapOperator(int idServer, int idRequest) {
-
 		if (canRemove(idRequest))
 			removeOperator(idRequest);
 		mRequestsServers[idRequest] = idServer;
@@ -196,6 +208,9 @@ public class State {
 		// tiempo
 		mServersRequests[idServer].addLink(idRequest, sServers.tranmissionTime(
 				idServer, sRequests.getRequest(idRequest)[0]));
+		mTotalTime += sServers.tranmissionTime(idServer, sRequests
+				.getRequest(idRequest)[0]);
+		mTotalPenalization -= sPenalization;
 	}
 
 	public boolean canSwap(int idServer, int idRequest) {
@@ -219,6 +234,9 @@ public class State {
 		mServersRequests[oldServer]
 				.delLink(idRequest, sServers.tranmissionTime(oldServer,
 						sRequests.getRequest(idRequest)[0]));
+		mTotalTime -= sServers.tranmissionTime(oldServer, sRequests
+				.getRequest(idRequest)[0]);
+		mTotalPenalization += sPenalization;
 	}
 
 	public boolean canRemove(int idRequest) {
