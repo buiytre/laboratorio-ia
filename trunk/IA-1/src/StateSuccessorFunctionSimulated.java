@@ -38,22 +38,22 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 			//
 			switch (rdm.nextInt(2)) {
 			case 0:
-				if (padre.canSwap(idServer, idRequest)) {
+				if (State.getSwapOperator() && padre.canSwap(idServer, idRequest)) {
 					hijo = new State(padre);
 					hijo.swapOperator(idServer, idRequest);
 					str = str.concat("swap " + getSuccessorComment(hijo, idRequest));
-				} else if (padre.canRemove(idRequest)) {
+				} else if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
 					hijo = new State(padre);
 					hijo.removeOperator(idRequest);
 					str = str.concat("remove " + getSuccessorComment(hijo, idRequest));
 				}
 				break;
 			case 1:
-				if (padre.canRemove(idRequest)) {
+				if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
 					hijo = new State(padre);
 					hijo.removeOperator(idRequest);
 					str = str.concat("remove " + getSuccessorComment(hijo, idRequest));
-				} else if (padre.canSwap(idServer, idRequest)) {
+				} else if (State.getSwapOperator() && padre.canSwap(idServer, idRequest)) {
 					hijo = new State(padre);
 					hijo.swapOperator(idServer, idRequest);
 					str = str.concat("swap " + getSuccessorComment(hijo, idRequest));

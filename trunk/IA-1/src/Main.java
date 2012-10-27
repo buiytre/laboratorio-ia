@@ -1,3 +1,5 @@
+import sun.management.Agent;
+import aima.search.framework.Metrics;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
@@ -9,32 +11,36 @@ public class Main {
 	public static void main(String args[]) {
 		Search search = null; 
 		Problem problem = null;
-		String statement = "Full Requests";
-		boolean greedy = false;
 		int nServers = 50;
 		int nReplications = 5;
 		// int nUsers = 200;
-		int nUsers = 2;
+		int nUsers = 750;
 		// int nRequestsUser = 5;
-		int nRequestsUser = 4;
+		int nRequestsUser = 5;
 		int seed = 10;
-		boolean swapOperator = false;
+		
+		// Parametros tipo de ejecución
+		boolean swapOperator = true;
 		boolean removeOperator = false;
+		// Valores posibles para heuristic: "max" y "stdev"
 		String heuristic = "max";
+		// Valores posibles para algorythm "Simulated Anneling" y "Hill Climbing"
 		String algorythm = "Hill Climbing";
+		// Valores posibles para statement "Full Requests" y "Partial Requests"
+		String statement = "Partial Requests";
+		boolean greedy = false;
+		
+		
 		SuccessorFunction successorAlgorythm = null;
 		
 		// Parametros Simulated Anneling
-		int steps = -1;
-		int stiter = -1;
-		int k = -1;
-		double lamb = -1;
+		int steps = 2000;
+		int stiter = 100;
+		int k = 5;
+		double lamb = 0.001;
 		
 		State estat = new State(nServers, nReplications, nUsers, nRequestsUser,
 				seed, swapOperator, removeOperator, heuristic);
-		// estat.initialRandomStateFullRequests(seed);
-		// estat.initialGreedyState();
-		// estat.initialRandomState(seed);
 		
 		// Decidimos estado inicial
 		if(statement.equals("Full Requests")){
@@ -50,7 +56,7 @@ public class Main {
 				estat.initialRandomState(seed);
 			}
 		}
-		
+		System.out.println(estat.toString());
 		// Decidimos algoritmo
 		if(algorythm.equals("Hill Climbing")){
 			successorAlgorythm = new StateSuccessorFunctionHill();
@@ -75,7 +81,11 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(estat.toString());
+		State end = (State) search.getGoalState();
+		System.out.println(end.toString());
+		Metrics m = search.getMetrics();
+		int iteraciones = m.getInt("nodesExpanded");
+		System.out.println("Iteraciones: " + iteraciones + "\n");
 		
 		
 

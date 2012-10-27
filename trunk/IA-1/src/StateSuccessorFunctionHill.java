@@ -29,8 +29,9 @@ public class StateSuccessorFunctionHill implements SuccessorFunction{
 		for(int i = 0; i < requestCount ; ++i){
 			it = totalServers.fileLocations(totalRequests.getRequest(i)[1]).iterator();
 			while(it.hasNext()){
+				str = "Sucesor creado con el operador ";
 				idServer = it.next();
-				if(padre.canRemove(i)){
+				if(State.getRemoveOperator() && padre.canRemove(i)){
 					hijo = new State(padre);
 					hijo.removeOperator(i);
 					if(State.getHeuristicMode().equals("max")){
@@ -41,7 +42,7 @@ public class StateSuccessorFunctionHill implements SuccessorFunction{
 					str = str.concat("remove sobre la request '" + i + "' con valor heurístico '" + Double.toString(heuristic) + "'.");
 					successor.add(new Successor(str, hijo));
 				}
-				if(padre.canSwap(idServer, i)){
+				if(State.getSwapOperator() && padre.canSwap(idServer, i)){
 					hijo = new State(padre);
 					hijo.swapOperator(idServer, i);
 					if(State.getHeuristicMode().equals("max")){
