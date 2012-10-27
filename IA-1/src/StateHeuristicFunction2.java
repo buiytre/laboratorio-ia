@@ -11,10 +11,8 @@ public class StateHeuristicFunction2 implements HeuristicFunction{
 		for(int i = 0; i < State.getServersCount(); ++i){
 			deviation += Math.abs(actualState.getServerTime(i) - average);
 		}
-		//Hasta aquí sería para el caso sin penalización, los comentarios de abajo son para recordar que hemos hablado
-		//actualState.getTotalPenalizationTime();
-		// Hay que sumar la relacion entre numPeticiones <-> peticiones no servidas <-> numServidores
-		return deviation;
+		// Devolvemos la media de tiempo del servidor, mas la desviación estandar, mas el tiempo de penalización total del estado dividido por la cantidad de servidores. 
+		return average + deviation + (actualState.getTotalPenalizationTime() / State.getServersCount());
 	}
 
 }
