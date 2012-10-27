@@ -9,7 +9,7 @@ public class Main {
 	public static void main(String args[]) {
 		Search search = null; 
 		Problem problem = null;
-		String statement = "";
+		String statement = "Full Requests";
 		boolean greedy = false;
 		int nServers = 50;
 		int nReplications = 5;
@@ -20,8 +20,8 @@ public class Main {
 		int seed = 10;
 		boolean swapOperator = false;
 		boolean removeOperator = false;
-		String heuristic = "";
-		String algorythm = "";
+		String heuristic = "max";
+		String algorythm = "Hill Climbing";
 		SuccessorFunction successorAlgorythm = null;
 		
 		// Parametros Simulated Anneling
@@ -75,7 +75,8 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		System.out.println(estat.toString());
+		
 		
 
 	}
