@@ -16,6 +16,10 @@ public class State {
 	private static boolean sSwapOperator = false;
 	private static boolean sRemoveOperator = false;
 	private static String sHeuristicMode = "";
+	private static int sUsersCount = 0;
+	private static int sMaxUserRequests = 0;
+	private static int sSeed = 0;
+	private static int sReplications = 0;
 
 	// Parte dinamica
 	private Link[] mServersRequests = null;
@@ -31,9 +35,16 @@ public class State {
 		} catch (WrongParametersException e) {
 			e.printStackTrace();
 		}
+		State.sUsersCount = nUsers;
+		State.sMaxUserRequests = nRequestsUser;
+		State.sSeed = seed;
+		State.sReplications = nReplications;
 		State.sHeuristicMode = new String(heuristic);
 		sRequests = new Requests(nUsers, nRequestsUser, seed);
 		mServersRequests = new Link[nServers];
+		for (int i = 0; i < mServersRequests.length; ++i) {
+			mServersRequests[i] = new Link();
+		}
 		sRequestsCount = sRequests.size();
 		sServersCount = nServers;
 		mRequestsServers = new int[sRequestsCount];
@@ -62,6 +73,9 @@ public class State {
 	}
 
 	public State(State oldState) {
+		mTotalTime = oldState.mTotalTime;
+		mTotalPenalizationTime = oldState.mTotalPenalizationTime;
+		this.mServersRequests = oldState.mServersRequests.clone();
 		this.mRequestsServers = oldState.mRequestsServers.clone();
 		for (int i = 0; i < mServersRequests.length; ++i) {
 			this.mServersRequests[i] = new Link(oldState.mServersRequests[i]);
@@ -101,10 +115,19 @@ public class State {
 		return sHeuristicMode;
 	}
 	
-	public int getAverage() {
+	public double getAverage() {
 		return (mTotalTime / sServersCount);
 	}
 
+	public double getStDev() {
+		double avg = getAverage();
+		double incr = 0;
+		for (int i = 0; i < sServersCount; ++i) {
+			incr += Math.pow(mServersRequests[i].getTotalTime()-avg, 2);	
+		}
+		return Math.sqrt(incr/(sServersCount-1));
+	}
+	
 	public int getTotalPenalizationTime() {
 		return mTotalPenalizationTime;
 	}
@@ -301,6 +324,48 @@ public class State {
 			return false;
 		}
 
+	}
+	
+	@Override
+	public String toString(){
+		String ret = "###########\n";
+		int[] req = null;
+		Link ln = null;
+		double deviation = this.getStDev();
+		double average = this.getAverage();
+		ret = ret.concat("###########\n");
+		ret = ret.concat("Número de servidores: " + sServersCount + "\n");
+		ret = ret.concat("Número de usuarios: " + sUsersCount + "\n");
+		ret = ret.concat("Número máximo de peticiones por usuario: " + sMaxUserRequests + "\n");
+		ret = ret.concat("Número de replicaciones: " + sReplications + "\n");
+		ret = ret.concat("Número de seed: " + sSeed + "\n");
+		ret = ret.concat("###########\n");				
+		
+		for(int i = 0; i < sRequestsCount; ++i){
+			ret = ret.concat("-----------\n");
+			ret = ret.concat("Request: " + i + "\n");
+			req = sRequests.getRequest(i);
+			ret = ret.concat("Usuario: " + req[0] + "\nFichero: " + req[1] +"\n");
+			if (mRequestsServers[i] == -1) {
+				ret = ret.concat("Servidor no asignado\n");
+			} else {
+				ret = ret.concat("Servidor: " + mRequestsServers[i] + "\n");
+			}
+		}
+		ret = ret.concat("-----------\n");
+		ret = ret.concat("###########\n");
+		for (int i = 0; i < sServersCount; ++i) {
+			ln = mServersRequests[i];
+			ret = ret.concat("Server: " + i + "\n");
+			ret = ret.concat("Carga: " + ln.getTotalTime() + "\n-----------\n");
+		}
+		ret = ret.concat("###########\n");
+		ret = ret.concat("Media de carga: " + average + "\n");
+		
+		
+		ret = ret.concat("Stdev: " + deviation + "\n###########\n");
+		
+		return ret;
 	}
 
 }
