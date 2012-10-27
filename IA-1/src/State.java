@@ -13,6 +13,9 @@ public class State {
 	private static int sRequestsCount = 0;
 	private static int sServersCount = 0;
 	private static int sPenalization = 0;
+	private static boolean sSwapOperator = false;
+	private static boolean sRemoveOperator = false;
+	private static String sHeuristicMode = "";
 
 	// Parte dinamica
 	private Link[] mServersRequests = null;
@@ -21,32 +24,41 @@ public class State {
 	private int mTotalPenalizationTime = 0;
 
 	public State(int nServers, int nReplications, int nUsers,
-			int nRequestsUser, int seed) {
+			int nRequestsUser, int seed, boolean swapOperator,
+			boolean removeOperator, String heuristic) {
 		try {
 			sServers = new Servers(nServers, nReplications, seed);
 		} catch (WrongParametersException e) {
 			e.printStackTrace();
 		}
+		State.sHeuristicMode = new String(heuristic);
 		sRequests = new Requests(nUsers, nRequestsUser, seed);
 		mServersRequests = new Link[nServers];
 		sRequestsCount = sRequests.size();
 		sServersCount = nServers;
 		mRequestsServers = new int[sRequestsCount];
+		State.sSwapOperator = swapOperator;
+		State.sRemoveOperator = removeOperator;
 		for (int i = 0; i < sRequestsCount; ++i) {
 			mRequestsServers[i] = -1;
 		}
 	}
 
 	public State(int nServers, int nReplications, int nUsers,
-			int nRequestsUser, int seed, int penalization) {
-		this(nServers, nReplications, nUsers, nRequestsUser, seed);
+			int nRequestsUser, int seed, boolean swapOperator,
+			boolean removeOperator, String heuristic, int penalization) {
+		this(nServers, nReplications, nUsers, seed, nRequestsUser,
+				swapOperator, removeOperator, heuristic);
 		sPenalization = penalization;
-		mTotalPenalizationTime = sRequestsCount * sPenalization; // Se cuenta por
-																// defecto todas
-																// los links sin
-																// asignar,
-																// sumamos
-																// penalizaciones
+		mTotalPenalizationTime = sRequestsCount * sPenalization; // Se cuenta
+																	// por
+																	// defecto
+																	// todas
+																	// los links
+																	// sin
+																	// asignar,
+																	// sumamos
+																	// penalizaciones
 	}
 
 	public State(State oldState) {
@@ -55,6 +67,25 @@ public class State {
 			this.mServersRequests[i] = new Link(oldState.mServersRequests[i]);
 		}
 		this.mTotalTime = oldState.mTotalTime;
+	}
+
+	public static Requests getRequests() {
+		return sRequests;
+	}
+
+	public static Servers getServers() {
+		return sServers;
+	}
+
+	public static boolean getSwapOperator() {
+		return sSwapOperator;
+	}
+
+	public static boolean getRemoveOperator() {
+		return sRemoveOperator;
+	}
+
+	public static void getServerPerRequest() {
 
 	}
 
@@ -62,14 +93,22 @@ public class State {
 		return sServersCount;
 	}
 
+	public static int getRequestsCount() {
+		return sRequestsCount;
+	}
+
+	public static String getHeuristicMode(){
+		return sHeuristicMode;
+	}
+	
 	public int getAverage() {
 		return (mTotalTime / sServersCount);
 	}
 
-	public int getTotalPenalizationTime(){
+	public int getTotalPenalizationTime() {
 		return mTotalPenalizationTime;
 	}
-	
+
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -116,17 +155,17 @@ public class State {
 			idServer = it.next(); // it tendrá mínimo un servidor, los files
 			// tienen número mínimo de réplicas
 			optimalTime = mServersRequests[idServer].getTotalTime()
-					+ sServers.tranmissionTime(idServer, sRequests
-							.getRequest(i)[0]);
+					+ sServers.tranmissionTime(idServer,
+							sRequests.getRequest(i)[0]);
 			while (it.hasNext()) {
 				nextServer = it.next();
 				if (optimalTime > mServersRequests[nextServer].getTotalTime()
-						+ sServers.tranmissionTime(nextServer, sRequests
-								.getRequest(i)[0])) {
+						+ sServers.tranmissionTime(nextServer,
+								sRequests.getRequest(i)[0])) {
 					idServer = nextServer;
 					optimalTime = mServersRequests[nextServer].getTotalTime()
-							+ sServers.tranmissionTime(nextServer, sRequests
-									.getRequest(i)[0]);
+							+ sServers.tranmissionTime(nextServer,
+									sRequests.getRequest(i)[0]);
 				}
 			}
 			// Asignarle el fichero
@@ -181,17 +220,17 @@ public class State {
 			idServer = it.next(); // it tendrá mínimo un servidor, los files
 			// tienen número mínimo de réplicas
 			optimalTime = mServersRequests[idServer].getTotalTime()
-					+ sServers.tranmissionTime(idServer, sRequests
-							.getRequest(i)[0]);
+					+ sServers.tranmissionTime(idServer,
+							sRequests.getRequest(i)[0]);
 			while (it.hasNext()) {
 				nextServer = it.next();
 				if (optimalTime > mServersRequests[nextServer].getTotalTime()
-						+ sServers.tranmissionTime(nextServer, sRequests
-								.getRequest(i)[0])) {
+						+ sServers.tranmissionTime(nextServer,
+								sRequests.getRequest(i)[0])) {
 					idServer = nextServer;
 					optimalTime = mServersRequests[nextServer].getTotalTime()
-							+ sServers.tranmissionTime(nextServer, sRequests
-									.getRequest(i)[0]);
+							+ sServers.tranmissionTime(nextServer,
+									sRequests.getRequest(i)[0]);
 				}
 			}
 
@@ -210,44 +249,58 @@ public class State {
 		mRequestsServers[idRequest] = idServer;
 		// Agregar a la lista de requests del servidor actual el request y su
 		// tiempo
-		mServersRequests[idServer].addLink(idRequest, sServers.tranmissionTime(
-				idServer, sRequests.getRequest(idRequest)[0]));
-		mTotalTime += sServers.tranmissionTime(idServer, sRequests
-				.getRequest(idRequest)[0]);
+		mServersRequests[idServer].addLink(
+				idRequest,
+				sServers.tranmissionTime(idServer,
+						sRequests.getRequest(idRequest)[0]));
+		mTotalTime += sServers.tranmissionTime(idServer,
+				sRequests.getRequest(idRequest)[0]);
 		mTotalPenalizationTime -= sPenalization;
 	}
 
 	public boolean canSwap(int idServer, int idRequest) {
-		// Comprobar que la request existe
-		if (idRequest >= sRequestsCount)
-			return false;
+		if (sSwapOperator == true) {
+			// Comprobar que la request existe
+			if (idRequest >= sRequestsCount)
+				return false;
 
-		// Comprobar que el servidor objetivo contiene el fichero(log n) (y se
-		// comprueba que el servidor existe por extensión)
-		if (!sServers.fileLocations(sRequests.getRequest(idRequest)[1])
-				.contains(idServer)) {
+			// Comprobar que el servidor objetivo contiene el fichero(log n) (y
+			// se
+			// comprueba que el servidor existe por extensión)
+			if (!sServers.fileLocations(sRequests.getRequest(idRequest)[1])
+					.contains(idServer)) {
+				return false;
+			}
+			return true;
+		} else {
 			return false;
 		}
-		return true;
+
 	}
 
 	public void removeOperator(int idRequest) {
 		int oldServer = mRequestsServers[idRequest];
 		mRequestsServers[idRequest] = -1;
 		// Eliminar de la lista de request del servidor actual el request
-		mServersRequests[oldServer]
-				.delLink(idRequest, sServers.tranmissionTime(oldServer,
+		mServersRequests[oldServer].delLink(
+				idRequest,
+				sServers.tranmissionTime(oldServer,
 						sRequests.getRequest(idRequest)[0]));
-		mTotalTime -= sServers.tranmissionTime(oldServer, sRequests
-				.getRequest(idRequest)[0]);
+		mTotalTime -= sServers.tranmissionTime(oldServer,
+				sRequests.getRequest(idRequest)[0]);
 		mTotalPenalizationTime += sPenalization;
 	}
 
 	public boolean canRemove(int idRequest) {
-		// Comprobar que la request existe
-		if (idRequest >= sRequestsCount)
+		if (sRemoveOperator == true) {
+			// Comprobar que la request existe
+			if (idRequest >= sRequestsCount)
+				return false;
+			return mRequestsServers[idRequest] == -1 ? false : true;
+		} else {
 			return false;
-		return mRequestsServers[idRequest] == -1 ? false : true;
+		}
+
 	}
 
 }
