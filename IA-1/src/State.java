@@ -26,6 +26,8 @@ public class State {
 	private int[] mRequestsServers = null;
 	private int mTotalTime = 0;
 	private int mTotalPenalizationTime = 0;
+	private double mHeuristic1 = -1;
+	private double mHeuristic2 = -1;
 
 	public State(int nServers, int nReplications, int nUsers,
 			int nRequestsUser, int seed, boolean swapOperator,
@@ -111,10 +113,10 @@ public class State {
 		return sRequestsCount;
 	}
 
-	public static String getHeuristicMode(){
+	public static String getHeuristicMode() {
 		return sHeuristicMode;
 	}
-	
+
 	public double getAverage() {
 		return (mTotalTime / sServersCount);
 	}
@@ -123,15 +125,19 @@ public class State {
 		double avg = getAverage();
 		double incr = 0;
 		for (int i = 0; i < sServersCount; ++i) {
-			incr += Math.pow(mServersRequests[i].getTotalTime()-avg, 2);	
+			incr += Math.pow(mServersRequests[i].getTotalTime() - avg, 2);
 		}
-		return Math.sqrt(incr/(sServersCount-1));
+		return Math.sqrt(incr / (sServersCount - 1));
 	}
-	
+
 	public int getTotalPenalizationTime() {
 		return mTotalPenalizationTime;
 	}
 
+	public int getServerTime(int idServer) {
+		return mServersRequests[idServer].getTotalTime();
+	}
+	
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -154,11 +160,17 @@ public class State {
 			// canSwap es implícito al haber buscado un válido
 			swapOperator(idServer, i);
 		}
+		heuristicGen();
+	}
+	
+	private void heuristicGen(){
+		StateHeuristicFunction1 heuristicFunction1 = new StateHeuristicFunction1();
+		StateHeuristicFunction2 heuristicFunction2 = new StateHeuristicFunction2();
+		mHeuristic1 = heuristicFunction1.getHeuristicValue(this);
+		mHeuristic2 = heuristicFunction2.getHeuristicValue(this);
 	}
 
-	public int getServerTime(int idServer) {
-		return mServersRequests[idServer].getTotalTime();
-	}
+
 
 	public void initialGreedyStateFullRequests() {
 		Set<Integer> serverSet;
@@ -195,6 +207,7 @@ public class State {
 			// canSwap es implícito al haber buscado un válido
 			swapOperator(idServer, i);
 		}
+		heuristicGen();
 	}
 
 	public void initialRandomState(int seed) {
@@ -223,6 +236,7 @@ public class State {
 				swapOperator(idServer, i);
 			}
 		}
+		heuristicGen();
 	}
 
 	public void initialGreedyState() {
@@ -264,6 +278,7 @@ public class State {
 				swapOperator(idServer, i);
 			}
 		}
+		heuristicGen();
 	}
 
 	public void swapOperator(int idServer, int idRequest) {
@@ -279,25 +294,27 @@ public class State {
 		mTotalTime += sServers.tranmissionTime(idServer,
 				sRequests.getRequest(idRequest)[0]);
 		mTotalPenalizationTime -= sPenalization;
+		// Recalculamos el heurístico
+		heuristicGen();
 	}
 
 	public boolean canSwap(int idServer, int idRequest) {
-		if (sSwapOperator == true) {
-			// Comprobar que la request existe
-			if (idRequest >= sRequestsCount)
-				return false;
+		// Comprobar que la request existe
+		if (idRequest >= sRequestsCount)
+			return false;
 
-			// Comprobar que el servidor objetivo contiene el fichero(log n) (y
-			// se
-			// comprueba que el servidor existe por extensión)
-			if (!sServers.fileLocations(sRequests.getRequest(idRequest)[1])
-					.contains(idServer)) {
-				return false;
-			}
-			return true;
-		} else {
+		// Comprobar que el servidor objetivo contiene el fichero(log n) (y
+		// se
+		// comprueba que el servidor existe por extensión)
+		if (!sServers.fileLocations(sRequests.getRequest(idRequest)[1])
+				.contains(idServer)) {
 			return false;
 		}
+		//Comprobar que no hagamos swap sobre nosotros mismos
+		if (mRequestsServers[idRequest] == idServer) {
+			return false;
+		}
+		return true;
 
 	}
 
@@ -312,22 +329,19 @@ public class State {
 		mTotalTime -= sServers.tranmissionTime(oldServer,
 				sRequests.getRequest(idRequest)[0]);
 		mTotalPenalizationTime += sPenalization;
+		// Recalculamos el heurístico
+		heuristicGen();
 	}
 
 	public boolean canRemove(int idRequest) {
-		if (sRemoveOperator == true) {
-			// Comprobar que la request existe
-			if (idRequest >= sRequestsCount)
-				return false;
-			return mRequestsServers[idRequest] == -1 ? false : true;
-		} else {
+		// Comprobar que la request existe
+		if (idRequest >= sRequestsCount)
 			return false;
-		}
-
+		return mRequestsServers[idRequest] == -1 ? false : true;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		String ret = "###########\n";
 		int[] req = null;
 		Link ln = null;
@@ -336,35 +350,46 @@ public class State {
 		ret = ret.concat("###########\n");
 		ret = ret.concat("Número de servidores: " + sServersCount + "\n");
 		ret = ret.concat("Número de usuarios: " + sUsersCount + "\n");
-		ret = ret.concat("Número máximo de peticiones por usuario: " + sMaxUserRequests + "\n");
+		ret = ret.concat("Número máximo de peticiones por usuario: "
+				+ sMaxUserRequests + "\n");
 		ret = ret.concat("Número de replicaciones: " + sReplications + "\n");
 		ret = ret.concat("Número de seed: " + sSeed + "\n");
-		ret = ret.concat("###########\n");				
+		ret = ret.concat("###########\n");
+
+//		for (int i = 0; i < sRequestsCount; ++i) {
+//			ret = ret.concat("-----------\n");
+//			ret = ret.concat("Request: " + i + "\n");
+//			req = sRequests.getRequest(i);
+//			ret = ret.concat("Usuario: " + req[0] + "\nFichero: " + req[1]
+//					+ "\n");
+//			if (mRequestsServers[i] == -1) {
+//				ret = ret.concat("Servidor no asignado\n");
+//				
+//			} else {
+//				ret = ret.concat("Servidor: " + mRequestsServers[i] + "\n");
+//				ret = ret.concat("Tiempo Usuario/Servidor: " + sServers.tranmissionTime(mRequestsServers[i], req[0]));
+//			}
+//			Iterator<Integer> it = sServers.fileLocations(req[1]).iterator();
+//			int idServer = -1;
+//			while(it.hasNext()){
+//				idServer = it.next();
+//				ret = ret.concat("Tiempo usuario-server " + idServer + ": " + sServers.tranmissionTime(idServer, req[0]) + "\n");
+//			}
+//		}
+//		ret = ret.concat("-----------\n");
+//		ret = ret.concat("###########\n");
+//		for (int i = 0; i < sServersCount; ++i) {
+//			ln = mServersRequests[i];
+//			ret = ret.concat("Server: " + i + "\n");
+//			ret = ret.concat("Carga: " + ln.getTotalTime() + "\n-----------\n");
+//		}
 		
-		for(int i = 0; i < sRequestsCount; ++i){
-			ret = ret.concat("-----------\n");
-			ret = ret.concat("Request: " + i + "\n");
-			req = sRequests.getRequest(i);
-			ret = ret.concat("Usuario: " + req[0] + "\nFichero: " + req[1] +"\n");
-			if (mRequestsServers[i] == -1) {
-				ret = ret.concat("Servidor no asignado\n");
-			} else {
-				ret = ret.concat("Servidor: " + mRequestsServers[i] + "\n");
-			}
-		}
-		ret = ret.concat("-----------\n");
 		ret = ret.concat("###########\n");
-		for (int i = 0; i < sServersCount; ++i) {
-			ln = mServersRequests[i];
-			ret = ret.concat("Server: " + i + "\n");
-			ret = ret.concat("Carga: " + ln.getTotalTime() + "\n-----------\n");
-		}
-		ret = ret.concat("###########\n");
+		ret = ret.concat("Valor heurístico1: " + mHeuristic1 + "\n");
+		ret = ret.concat("Valor heurístico2: " + mHeuristic2 + "\n");
 		ret = ret.concat("Media de carga: " + average + "\n");
-		
-		
 		ret = ret.concat("Stdev: " + deviation + "\n###########\n");
-		
+
 		return ret;
 	}
 
