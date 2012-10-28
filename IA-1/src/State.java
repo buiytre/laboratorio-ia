@@ -328,6 +328,26 @@ public class State {
 		heuristicGen();
 		return this;
 	}
+	
+	public State orderedState() {
+		Set<Integer> serverSet;
+		int idFile = -1;
+		int idServer = -1;
+
+		Iterator<Integer> it;
+		for (int i = 0; i < sRequestsCount; ++i) {
+			idFile = sRequests.getRequest(i)[1];
+			// Obtener la lista de servidores con ese fichero
+			serverSet = sServers.fileLocations(idFile);
+
+			// Elegir el servidor con menos carga
+			it = serverSet.iterator();
+			idServer = it.next(); // it tendrá mínimo un servidor, los files
+			swapOperator(idServer, i);
+		}
+		heuristicGen();
+		return this;
+	}
 
 	public boolean canAdd(int idServer, int idRequest) {
 		// Comprobar que la request existe
