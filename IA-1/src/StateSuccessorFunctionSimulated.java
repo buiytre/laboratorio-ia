@@ -11,7 +11,6 @@ import java.util.Date;
 
 public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List getSuccessors(Object arg0) {
 		Requests totalRequests = State.getRequests();
@@ -108,8 +107,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 			case 3: // Add+Swap+Del
 				switch (rdm.nextInt(3)) {
 				case 0:
-					if (State.getSwapOperator()
-							&& padre.canSwap(idServer, idRequest)) {
+					if (padre.canSwap(idServer, idRequest)) {
 						hijo = new State(padre);
 						hijo.swapOperator(idServer, idRequest);
 						str = str.concat("swap "
@@ -117,7 +115,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 					}
 					break;
 				case 1:
-					if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
+					if (padre.canRemove(idRequest)) {
 						hijo = new State(padre);
 						hijo.removeOperator(idRequest);
 						str = str.concat("remove "
@@ -125,7 +123,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 					}
 					break;
 				case 2:
-					if (State.getAddOperator() && padre.canRemove(idRequest)) {
+					if (padre.canRemove(idRequest)) {
 						hijo = new State(padre);
 						hijo.addOperator(idServer, idRequest);
 						str = str.concat("add "
