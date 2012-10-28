@@ -15,8 +15,10 @@ public class Main {
 		// experiment1(1);
 		// experiment2(1);
 		// experiment3(1);
-		//experiment4(1);
-		experiment5(1);
+		// experiment4(1);
+		// experiment5(1);
+		// experiment6(1);
+		experiment7 (1);
 	}
 
 	private static void experiment1(int nTests) {
@@ -348,8 +350,7 @@ public class Main {
 		int nUsers = 200;
 		int nRequestsUser = 5;
 		int seed = 10;
-		String[] generatorFunc = { "Random", "Greedy" };
-
+		
 		// Establecer los parámetros del problema
 		State.setHeuristicMode("max");
 		criteria = new StateHeuristicFunction1();
@@ -480,7 +481,7 @@ public class Main {
 		State.setOperatorsMode(0);
 
 		System.out.println("##########\nEjercicio 5\n##########");
-		System.out.println("Heurística 1");
+		System.out.println("Hill Climbing, Heurística 1");
 		for (int i = 0; i < nTests; ++i) {
 			// El parámetro seed varía
 			State.setProblemParameters(nServers, nReplications, nUsers,
@@ -498,7 +499,8 @@ public class Main {
 			// Primer criterio (minimización del servidor con más carga)
 			State.setHeuristicMode("max");
 			criteria = new StateHeuristicFunction1();
-			problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
+			problem = new Problem(start, successorAlgorythm,
+					new StateGoalTest(), criteria);
 
 			// Ejecutar
 			try {
@@ -524,42 +526,46 @@ public class Main {
 		System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
 		System.out.println("----------");
 
-		System.out.println("Heurística 2 sin soluciones sin servir");
-			for (int i = 0; i < nTests; ++i) {
-				// El parámetro seed varía
-				State.setProblemParameters(nServers, nReplications, nUsers,
-						nRequestsUser, i);
+		System.out.println("Hill Climbing, Heurística 2 sin soluciones sin servir");
+		State.setOperatorsMode(0);
+		totalTimeAvg  = 0;
+		execTime = 0;
+		for (int i = 0; i < nTests; ++i) {
+			// El parámetro seed varía
+			State.setProblemParameters(nServers, nReplications, nUsers,
+					nRequestsUser, i);
 
-				// Generar el estado inicial (método generador greedy con
-				// peticiones sin servir)
-				d1 = new Date();
-				start = new State().greedyStateFullRequests();
+			// Generar el estado inicial (método generador greedy con
+			// peticiones sin servir)
+			d1 = new Date();
+			start = new State().greedyStateFullRequests();
 
-				// Usamos Hill Climbing
-				successorAlgorythm = new StateSuccessorFunctionHill();
-				search = new HillClimbingSearch();
+			// Usamos Hill Climbing
+			successorAlgorythm = new StateSuccessorFunctionHill();
+			search = new HillClimbingSearch();
 
-				// Primer criterio (minimización del servidor con más carga)
-				State.setHeuristicMode("stdev");
-				criteria = new StateHeuristicFunction2();
-				problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
+			// Primer criterio (minimización del servidor con más carga)
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
+			problem = new Problem(start, successorAlgorythm,
+					new StateGoalTest(), criteria);
 
-				// Ejecutar
-				try {
-					agent = new SearchAgent(problem, search);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				d2 = new Date();
-				// Comparar heurísticas inicial y final
-				end = (State) search.getGoalState();
-
-				// Sumatorio de resultados de heurística y tiempos de ejecución
-				// para cada caso
-				totalTimeAvg += end.getTotalTime();
-				execTime += d2.getTime() - d1.getTime();
+			// Ejecutar
+			try {
+				agent = new SearchAgent(problem, search);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		
+			d2 = new Date();
+			// Comparar heurísticas inicial y final
+			end = (State) search.getGoalState();
+			
+			// Sumatorio de resultados de heurística y tiempos de ejecución
+			// para cada caso
+			totalTimeAvg += end.getTotalTime();
+			execTime += d2.getTime() - d1.getTime();
+		}
+
 		// Cálculos de media de heurística y tiempos de ejecución para cada
 		// caso usando el sumatorio
 		totalTimeAvg /= nTests;
@@ -568,12 +574,14 @@ public class Main {
 		System.out.println("Tiempo medio de ejecución: " + execTime);
 		System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
 		System.out.println("----------");
-	
+
 		State.setOperatorsMode(1);
-		System.out.println("Heurística 2 con soluciones sin servir");
+		System.out.println("Hill Climbing, Heurística 2 con soluciones sin servir");
 		for (int i = 0; i < penalizations.length; ++i) {
 			State.setPenalizationTime(penalizations[i]);
 			System.out.println("Penalización: " + penalizations[i]);
+			totalTimeAvg  = 0;
+			execTime = 0;
 			for (int j = 0; j < nTests; ++j) {
 				// El parámetro seed varía
 				State.setProblemParameters(nServers, nReplications, nUsers,
@@ -616,11 +624,325 @@ public class Main {
 			// caso usando el sumatorio
 			totalTimeAvg /= nTests;
 			execTime /= nTests;
-			
+
 			System.out.println("Tiempo medio de ejecución: " + execTime);
 			System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
 			System.out.println("----------");
 		}
 	}
 
+	private static void experiment6(int nTests) {
+		State start = null;
+		State end = null;
+		Search search = null;
+		Problem problem = null;
+		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+
+		Date d1 = null;
+		Date d2 = null;
+		long execTime = 0;
+		long totalTimeAvg = 0;
+
+		int nServers = 50;
+		int nReplications = 5;
+		int nUsers = 200;
+		int nRequestsUser = 5;
+		int seed = 10;
+
+		// Parámetros de Simulated Annealing
+		//TODO: Generar
+		int steps = 0;
+		int stiter = 0;
+		int k = 0;
+		double lamb = 0;
+
+		int penalizations[] = { 5000, 4000, 3000, 2000, 1000, 500, 0 };
+
+		// Establecer los parámetros del problema
+		// Primer criterio, sin peticiones sin servir
+		State.setOperatorsMode(0);
+
+		System.out.println("##########\nEjercicio 6\n##########");
+		System.out.println("Simulated Annealing, Heurística 1");
+		for (int i = 0; i < nTests; ++i) {
+			// El parámetro seed varía
+			State.setProblemParameters(nServers, nReplications, nUsers,
+					nRequestsUser, i);
+
+			// Generar el estado inicial (método generador greedy con
+			// peticiones sin servir)
+			d1 = new Date();
+			start = new State().greedyStateFullRequests();
+
+			// Usamos Simulated Annealing
+			successorAlgorythm = new StateSuccessorFunctionSimulated();
+			search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
+
+			// Primer criterio (minimización del servidor con más carga)
+			State.setHeuristicMode("max");
+			criteria = new StateHeuristicFunction1();
+			problem = new Problem(start, successorAlgorythm,
+					new StateGoalTest(), criteria);
+
+			// Ejecutar
+			try {
+				agent = new SearchAgent(problem, search);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			d2 = new Date();
+			// Comparar heurísticas inicial y final
+			end = (State) search.getGoalState();
+
+			// Sumatorio de resultados de heurística y tiempos de ejecución
+			// para cada caso
+			totalTimeAvg += end.getTotalTime();
+			execTime += d2.getTime() - d1.getTime();
+		}
+		// Cálculos de media de heurística y tiempos de ejecución para cada
+		// caso usando el sumatorio
+		totalTimeAvg /= nTests;
+		execTime /= nTests;
+
+		System.out.println("Tiempo medio de ejecución: " + execTime);
+		System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
+		System.out.println("----------");
+
+		System.out.println("Simulated Annealing, Heurística 2 sin soluciones sin servir");
+		State.setOperatorsMode(0);
+		totalTimeAvg  = 0;
+		execTime = 0;
+		for (int i = 0; i < nTests; ++i) {
+			// El parámetro seed varía
+			State.setProblemParameters(nServers, nReplications, nUsers,
+					nRequestsUser, i);
+
+			// Generar el estado inicial (método generador greedy con
+			// peticiones sin servir)
+			d1 = new Date();
+			start = new State().greedyStateFullRequests();
+
+			// Usamos Simulated Annealing
+			successorAlgorythm = new StateSuccessorFunctionSimulated();
+			search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
+
+			// Primer criterio (minimización del servidor con más carga)
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
+			problem = new Problem(start, successorAlgorythm,
+					new StateGoalTest(), criteria);
+
+			// Ejecutar
+			try {
+				agent = new SearchAgent(problem, search);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			d2 = new Date();
+			// Comparar heurísticas inicial y final
+			end = (State) search.getGoalState();
+			
+			// Sumatorio de resultados de heurística y tiempos de ejecución
+			// para cada caso
+			totalTimeAvg += end.getTotalTime();
+			execTime += d2.getTime() - d1.getTime();
+		}
+
+		// Cálculos de media de heurística y tiempos de ejecución para cada
+		// caso usando el sumatorio
+		totalTimeAvg /= nTests;
+		execTime /= nTests;
+
+		System.out.println("Tiempo medio de ejecución: " + execTime);
+		System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
+		System.out.println("----------");
+
+		State.setOperatorsMode(1);
+		System.out.println("Simulated Annealing, Heurística 2 con soluciones sin servir");
+		for (int i = 0; i < penalizations.length; ++i) {
+			State.setPenalizationTime(penalizations[i]);
+			System.out.println("Penalización: " + penalizations[i]);
+			totalTimeAvg  = 0;
+			execTime = 0;
+			for (int j = 0; j < nTests; ++j) {
+				// El parámetro seed varía
+				State.setProblemParameters(nServers, nReplications, nUsers,
+						nRequestsUser, j);
+
+				// Generar el estado inicial (método generador greedy con
+				// peticiones sin servir)
+				d1 = new Date();
+				start = new State().greedyState();
+
+				// Usamos Simulated Annealing
+				successorAlgorythm = new StateSuccessorFunctionSimulated();
+				search = new SimulatedAnnealingSearch(steps, stiter, k, lamb);
+
+				// Primer criterio (minimización del servidor con más carga)
+				State.setHeuristicMode("stdev");
+				criteria = new StateHeuristicFunction2();
+				problem = new Problem(start, successorAlgorythm,
+						new StateGoalTest(), criteria);
+
+				d2 = new Date();
+
+				// Ejecutar
+				d1 = new Date();
+				try {
+					agent = new SearchAgent(problem, search);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d2 = new Date();
+				// Comparar heurísticas inicial y final
+				end = (State) search.getGoalState();
+
+				// Sumatorio de resultados de heurística y tiempos de ejecución
+				// para cada caso
+				totalTimeAvg += end.getTotalTime();
+				execTime += d2.getTime() - d1.getTime();
+			}
+			// Cálculos de media de heurística y tiempos de ejecución para cada
+			// caso usando el sumatorio
+			totalTimeAvg /= nTests;
+			execTime /= nTests;
+
+			System.out.println("Tiempo medio de ejecución: " + execTime);
+			System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
+			System.out.println("----------");
+		}
+	}
+
+	private static void experiment7(int nTests) {
+		State start = null;
+		State end = null;
+		Search search = null;
+		Problem problem = null;
+		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+
+		Date d1 = null;
+		Date d2 = null;
+		long execTime = 0;
+		long totalTimeAvg = 0;
+
+		int nServers = 50;
+		int nReplications = 5;
+		int nUsers = 200;
+		int nRequestsUser = 5;
+		int seed = 10;
+		
+		// Establecer los parámetros del problema
+		State.setHeuristicMode("max");
+		criteria = new StateHeuristicFunction1();
+		State.setOperatorsMode(0);
+
+		System.out.println("##########\nEjercicio 7\n##########");
+		System.out.println("##########\nHeurística 1");
+		for (nReplications = 5; nReplications <= 25; nReplications += 5) {
+			System.out.println("Número de replicaciones: " + nReplications);
+
+			totalTimeAvg = 0;
+			execTime = 0;
+			for (int j = 0; j < nTests; ++j) {
+				// El parámetro seed varía
+				State.setProblemParameters(nServers, nReplications, nUsers,
+						nRequestsUser, j);
+
+				// Generar el estado inicial (método generador
+				// greedy sin peticiones sin servir)
+				d1 = new Date();
+				start = new State().greedyStateFullRequests();
+
+				// Usamos Hill Climbing
+				successorAlgorythm = new StateSuccessorFunctionHill();
+				search = new HillClimbingSearch();
+				
+				// Primer criterio (minimización del servidor con más carga)
+				State.setHeuristicMode("max");
+				criteria = new StateHeuristicFunction1();
+				problem = new Problem(start, successorAlgorythm,
+						new StateGoalTest(), criteria);
+
+				try {
+					agent = new SearchAgent(problem, search);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d2 = new Date();
+				end = (State) search.getGoalState();
+
+				// Sumatorio de resultados de heurística y tiempos de ejecución
+				// para cada caso
+				totalTimeAvg += end.getHeuristic1();
+				execTime += d2.getTime() - d1.getTime();
+			}
+			// Cálculos de media de heurística y tiempos de ejecución para cada
+			// caso usando el sumatorio
+			totalTimeAvg /= nTests;
+			execTime /= nTests;
+
+			System.out.println("Tiempo de ejecución: " + execTime);
+			System.out.println("Heurística media: " + totalTimeAvg);
+			System.out.println("----------");
+		}
+		System.out.println("##########\nIncremento de servidores");
+
+		System.out.println("##########\nHeurística 2");
+		for (nReplications = 5; nReplications <= 25; nReplications += 5) {
+			System.out.println("Número de replicaciones: " + nReplications);
+
+			totalTimeAvg = 0;
+			execTime = 0;
+			for (int j = 0; j < nTests; ++j) {
+				// El parámetro seed varía
+				State.setProblemParameters(nServers, nReplications, nUsers,
+						nRequestsUser, j);
+
+				// Generar el estado inicial (método generador
+				// greedy sin peticiones sin servir)
+				d1 = new Date();
+				start = new State().greedyStateFullRequests();
+
+				// Usamos Hill Climbing
+				successorAlgorythm = new StateSuccessorFunctionHill();
+				search = new HillClimbingSearch();
+
+				// Segundo criterio (minimización de media y desviación estándar)
+				State.setHeuristicMode("stdev");
+				criteria = new StateHeuristicFunction2();
+				problem = new Problem(start, successorAlgorythm,
+						new StateGoalTest(), criteria);
+
+				try {
+					agent = new SearchAgent(problem, search);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d2 = new Date();
+				end = (State) search.getGoalState();
+
+				// Sumatorio de resultados de heurística y tiempos de ejecución
+				// para cada caso
+				totalTimeAvg += end.getHeuristic1();
+				execTime += d2.getTime() - d1.getTime();
+			}
+			// Cálculos de media de heurística y tiempos de ejecución para cada
+			// caso usando el sumatorio
+			totalTimeAvg /= nTests;
+			execTime /= nTests;
+
+			System.out.println("Tiempo de ejecución: " + execTime);
+			System.out.println("Heurística media: " + totalTimeAvg);
+			System.out.println("----------");
+		}
+		System.out.println("##########\nIncremento de servidores");
+
+	}
+
+	
+	
 }
