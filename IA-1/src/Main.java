@@ -6,16 +6,18 @@ import aima.search.framework.SearchAgent;
 import aima.search.framework.SuccessorFunction;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+import java.util.Date;
 
 @SuppressWarnings("unused")
 public class Main {
 	public static void main(String args[]) {
+		
 		Search search = null; 
 		Problem problem = null;
 		int nServers = 50;
 		int nReplications = 5;
 		// int nUsers = 200;
-		int nUsers = 750;
+		int nUsers = 200;
 		// int nRequestsUser = 5;
 		int nRequestsUser = 5;
 		int seed = 10;
@@ -24,7 +26,7 @@ public class Main {
 		boolean swapOperator = true;
 		boolean removeOperator = false;
 		// Valores posibles para heuristic: "max" y "stdev"
-		String heuristic = "max";
+		String heuristic = "stdev";
 		// Valores posibles para algorythm "Simulated Anneling" y "Hill Climbing"
 		String algorythm = "Hill Climbing";
 		// Valores posibles para statement "Full Requests" y "Partial Requests"
@@ -91,4 +93,28 @@ public class Main {
 		
 
 	}
+	
+		private void experiment1(){
+			Search search = null; 
+			Problem problem = null;
+			int nServers = 50;
+			int nReplications = 5;
+			// int nUsers = 200;
+			int nUsers = 200;
+			// int nRequestsUser = 5;
+			int nRequestsUser = 5;
+			int seed = 10;
+			
+			// Parametros tipo de ejecución
+			boolean swapOperator = true;
+			boolean removeOperator = false;
+			// Valores posibles para heuristic: "max" y "stdev"
+			String heuristic = "max";
+			// Valores posibles para algorythm "Simulated Anneling" y "Hill Climbing"
+			String algorythm = "Hill Climbing";
+			// Valores posibles para statement "Full Requests" y "Partial Requests"
+			String statement = "Full Requests";
+			boolean greedy = false;
+		}
+	
 }
