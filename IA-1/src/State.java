@@ -114,11 +114,11 @@ public class State {
 		return sHeuristicMode;
 	}
 
-	public double getHeruistic1() {
+	public double getHeuristic1() {
 		return mHeuristic1;
 	}
 
-	public double getHeruistic2() {
+	public double getHeuristic2() {
 		return mHeuristic2;
 	}
 
