@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
 	public List getSuccessors(Object arg0) {
 		Requests totalRequests = State.getRequests();
