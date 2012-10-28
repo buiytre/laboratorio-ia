@@ -13,6 +13,7 @@ public class State {
 	private static int sRequestsCount = 0;
 	private static int sServersCount = 0;
 	private static int sPenalization = 0;
+	private static boolean sAddOperator = false;
 	private static boolean sSwapOperator = false;
 	private static boolean sRemoveOperator = false;
 	private static String sHeuristicMode = "";
@@ -29,51 +30,44 @@ public class State {
 	private double mHeuristic1 = -1;
 	private double mHeuristic2 = -1;
 
-	public State(int nServers, int nReplications, int nUsers,
-			int nRequestsUser, int seed, boolean swapOperator,
-			boolean removeOperator, String heuristic) {
+	public static void setProblemParameters(int nServers, int nReplications, int nUsers,
+			int nRequestsUser, int seed) {
 		try {
 			sServers = new Servers(nServers, nReplications, seed);
 		} catch (WrongParametersException e) {
 			e.printStackTrace();
 		}
+		
 		State.sUsersCount = nUsers;
 		State.sMaxUserRequests = nRequestsUser;
 		State.sSeed = seed;
 		State.sReplications = nReplications;
-		State.sHeuristicMode = new String(heuristic);
 		sRequests = new Requests(nUsers, nRequestsUser, seed);
-		mServersRequests = new Link[nServers];
+		sRequestsCount = sRequests.size();
+		sServersCount = nServers;
+	}
+	
+	public State() {
+		mServersRequests = new Link[sServersCount];
 		for (int i = 0; i < mServersRequests.length; ++i) {
 			mServersRequests[i] = new Link();
 		}
-		sRequestsCount = sRequests.size();
-		sServersCount = nServers;
 		mRequestsServers = new int[sRequestsCount];
-		State.sSwapOperator = swapOperator;
-		State.sRemoveOperator = removeOperator;
 		for (int i = 0; i < sRequestsCount; ++i) {
 			mRequestsServers[i] = -1;
 		}
-	}
-
-	public State(int nServers, int nReplications, int nUsers,
-			int nRequestsUser, int seed, boolean swapOperator,
-			boolean removeOperator, String heuristic, int penalization) {
-		this(nServers, nReplications, nUsers, seed, nRequestsUser,
-				swapOperator, removeOperator, heuristic);
-		sPenalization = penalization;
+		
 		mTotalPenalizationTime = sRequestsCount * sPenalization; // Se cuenta
-																	// por
-																	// defecto
-																	// todas
-																	// los links
-																	// sin
-																	// asignar,
-																	// sumamos
-																	// penalizaciones
+		// por
+		// defecto
+		// todas
+		// los links
+		// sin
+		// asignar,
+		// sumamos
+		// penalizaciones
 	}
-
+	
 	public State(State oldState) {
 		mTotalTime = oldState.mTotalTime;
 		mTotalPenalizationTime = oldState.mTotalPenalizationTime;
@@ -93,6 +87,10 @@ public class State {
 		return sServers;
 	}
 
+	public static boolean getAddOperator() {
+		return sAddOperator;
+	}
+	
 	public static boolean getSwapOperator() {
 		return sSwapOperator;
 	}
@@ -116,7 +114,15 @@ public class State {
 	public static String getHeuristicMode() {
 		return sHeuristicMode;
 	}
+	
+	public double getHeruistic1(){
+		return mHeuristic1;
+	}
 
+	public double getHeruistic2(){
+		return mHeuristic2;
+	}
+	
 	public double getAverage() {
 		return (mTotalTime / sServersCount);
 	}
@@ -138,6 +144,34 @@ public class State {
 		return mServersRequests[idServer].getTotalTime();
 	}
 	
+	public static void setAddOperator(boolean b) {
+		sAddOperator = b;
+	}
+	
+	public static void setSwapOperator(boolean b){
+		sSwapOperator = b;
+	}
+	public static void setRemoveOperator(boolean b){
+		sRemoveOperator = b;
+	}
+	
+	public static void setHeuristicMode(String s){
+		sHeuristicMode = new String(s);
+	}
+	
+	public static void setPenalizationTime(int penalization){
+		sPenalization = penalization;
+	}
+
+		
+	private void heuristicGen(){
+		StateHeuristicFunction1 heuristicFunction1 = new StateHeuristicFunction1();
+		StateHeuristicFunction2 heuristicFunction2 = new StateHeuristicFunction2();
+		mHeuristic1 = heuristicFunction1.getHeuristicValue(this);
+		mHeuristic2 = heuristicFunction2.getHeuristicValue(this);
+	}
+
+
 	public void initialRandomStateFullRequests(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
@@ -162,17 +196,8 @@ public class State {
 		}
 		heuristicGen();
 	}
-	
-	private void heuristicGen(){
-		StateHeuristicFunction1 heuristicFunction1 = new StateHeuristicFunction1();
-		StateHeuristicFunction2 heuristicFunction2 = new StateHeuristicFunction2();
-		mHeuristic1 = heuristicFunction1.getHeuristicValue(this);
-		mHeuristic2 = heuristicFunction2.getHeuristicValue(this);
-	}
 
-
-
-	public void initialGreedyStateFullRequests() {
+	public State greedyStateFullRequests() {
 		Set<Integer> serverSet;
 		int idFile = -1;
 		int idServer = -1;
@@ -208,9 +233,10 @@ public class State {
 			swapOperator(idServer, i);
 		}
 		heuristicGen();
+		return this;
 	}
 
-	public void initialRandomState(int seed) {
+	public State randomState(int seed) {
 		Set<Integer> serverSet;
 		Random rndGr = new Random(seed);
 		int rnd = -1;
@@ -237,9 +263,10 @@ public class State {
 			}
 		}
 		heuristicGen();
+		return this;
 	}
 
-	public void initialGreedyState() {
+	public State greedyState() {
 		Set<Integer> serverSet;
 		int idFile = -1;
 		int idServer = -1;
@@ -279,8 +306,47 @@ public class State {
 			}
 		}
 		heuristicGen();
+		return this;
 	}
 
+	public boolean canAdd(int idServer, int idRequest) {
+		// Comprobar que la request existe
+		if (idRequest >= sRequestsCount)
+			return false;
+
+		// Comprobar que el servidor objetivo contiene el fichero(log n) (y
+		// se
+		// comprueba que el servidor existe por extensión)
+		if (!sServers.fileLocations(sRequests.getRequest(idRequest)[1])
+				.contains(idServer)) {
+			return false;
+		}
+		//Comprobar que no hagamos swap sobre nosotros mismos
+		if (mRequestsServers[idRequest] == idServer) {
+			return false;
+		}
+		
+		if (!canRemove(idRequest)) return false;
+		return true;
+
+	}
+	
+	public void addOperator(int idServer, int idRequest) {
+		mRequestsServers[idRequest] = idServer;
+		// Agregar a la lista de requests del servidor actual el request y su
+		// tiempo
+		mServersRequests[idServer].addLink(
+				idRequest,
+				sServers.tranmissionTime(idServer,
+						sRequests.getRequest(idRequest)[0]));
+		mTotalTime += sServers.tranmissionTime(idServer,
+				sRequests.getRequest(idRequest)[0]);
+		mTotalPenalizationTime -= sPenalization;
+		// Recalculamos el heurístico
+		heuristicGen();
+	}
+
+	
 	public void swapOperator(int idServer, int idRequest) {
 		if (canRemove(idRequest))
 			removeOperator(idRequest);
@@ -297,7 +363,7 @@ public class State {
 		// Recalculamos el heurístico
 		heuristicGen();
 	}
-
+	
 	public boolean canSwap(int idServer, int idRequest) {
 		// Comprobar que la request existe
 		if (idRequest >= sRequestsCount)
