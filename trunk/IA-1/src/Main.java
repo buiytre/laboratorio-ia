@@ -19,7 +19,8 @@ public class Main {
 		// experiment5(1);
 		// experiment6(1);
 		// experiment7(1);
-		experiment8(1);
+//		experiment8(1);
+		experiment9(1);
 	}
 
 	private static void experiment1(int nTests) {
@@ -1033,5 +1034,78 @@ public class Main {
 		}
 	}
 	
-	
+	private static void experiment9(int nTests) {
+		State start = null;
+		State end = null;
+		Search search = null;
+		Problem problem = null;
+		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+
+		Date d1 = null;
+		Date d2 = null;
+		long execTime = 0;
+		long heurAvg = 0;
+
+		int nServers = 5;
+		int nReplications = 5;
+		int nUsers = 200;
+		int nRequestsUser = 5;
+		int seed = 10;
+		
+		// Establecer los parámetros del problema
+		State.setHeuristicMode("max");
+		criteria = new StateHeuristicFunction1();
+		State.setOperatorsMode(0);
+
+		System.out.println("##########\nEjercicio 9\n##########");
+		System.out.println("##########\nIncremento de peticiones");
+		nServers = 5;
+		nReplications = 2;
+		for (nRequestsUser = 5; nRequestsUser <= 25; nRequestsUser += 5) {
+			System.out.println("Número de peticiones: " + nRequestsUser);
+
+			heurAvg = 0;
+			execTime = 0;
+			for (int j = 0; j < nTests; ++j) {
+				// El parámetro seed varía
+				State.setProblemParameters(nServers, nReplications, nUsers,
+						nRequestsUser, j);
+
+				// Generar el estado inicial (método generador
+				// greedy sin peticiones sin servir)
+				d1 = new Date();
+				start = new State().greedyStateFullRequests();
+
+				// Usamos Hill Climbing
+				successorAlgorythm = new StateSuccessorFunctionHill();
+				search = new HillClimbingSearch();
+
+				problem = new Problem(start, successorAlgorythm,
+						new StateGoalTest(), criteria);
+
+				try {
+					agent = new SearchAgent(problem, search);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d2 = new Date();
+				end = (State) search.getGoalState();
+
+				// Sumatorio de resultados de heurística y tiempos de ejecución
+				// para cada caso
+				heurAvg += end.getHeuristic1();
+				execTime += d2.getTime() - d1.getTime();
+			}
+			// Cálculos de media de heurística y tiempos de ejecución para cada
+			// caso usando el sumatorio
+			heurAvg /= nTests;
+			execTime /= nTests;
+
+			System.out.println("Tiempo de ejecución: " + execTime);
+			System.out.println("Heurística media: " + heurAvg);
+			System.out.println("----------");
+		}
+	}
 }
