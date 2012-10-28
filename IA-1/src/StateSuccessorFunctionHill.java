@@ -53,6 +53,17 @@ public class StateSuccessorFunctionHill implements SuccessorFunction{
 					str = str.concat("swap sobre la request '" + i + "' con valor heurístico '" + Double.toString(heuristic) + "'.");
 					successor.add(new Successor(str, hijo));
 				}
+				if(State.getAddOperator() && padre.canAdd(idServer, i)){
+					hijo = new State(padre);
+					hijo.addOperator(idServer, i);
+					if(State.getHeuristicMode().equals("max")){
+						heuristic = heuristicMax.getHeuristicValue(hijo);
+					}else if(State.getHeuristicMode().equals("stdev")){
+						heuristic = heuristicStdev.getHeuristicValue(hijo);
+					}
+					str = str.concat("add sobre la request '" + i + "' con valor heurístico '" + Double.toString(heuristic) + "'.");
+					successor.add(new Successor(str, hijo));					
+				}
 			}
 			
 		}		
