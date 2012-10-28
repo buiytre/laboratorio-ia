@@ -7,6 +7,7 @@ import aima.search.framework.SuccessorFunction;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
 
+@SuppressWarnings("unused")
 public class Main {
 	public static void main(String args[]) {
 		Search search = null; 

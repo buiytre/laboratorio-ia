@@ -343,8 +343,8 @@ public class State {
 	@Override
 	public String toString() {
 		String ret = "###########\n";
-		int[] req = null;
-		Link ln = null;
+//		int[] req = null;
+//		Link ln = null;
 		double deviation = this.getStDev();
 		double average = this.getAverage();
 		ret = ret.concat("###########\n");
