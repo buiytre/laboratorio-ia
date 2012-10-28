@@ -18,7 +18,8 @@ public class Main {
 		// experiment4(1);
 		// experiment5(1);
 		// experiment6(1);
-		experiment7 (1);
+		// experiment7(1);
+		experiment8(1);
 	}
 
 	private static void experiment1(int nTests) {
@@ -943,6 +944,94 @@ public class Main {
 
 	}
 
+
+	private static void experiment8(int nTests) {
+		State start = null;
+		State end = null;
+		Search search = null;
+		Problem problem = null;
+		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+
+		Date d1 = null;
+		Date d2 = null;
+		long execTime = 0;
+		long totalTimeAvg = 0;
+		int unservedAvg = 0;
+
+		int nServers = 50;
+		int nReplications = 5;
+		int nUsers = 200;
+		int nRequestsUser = 5;
+		int seed = 10;
+
+		int penalizations[] = { 5000, 4000, 3000, 2000, 1000, 500, 0 };
+
+		// Establecer los parámetros del problema
+		// Segundo criterio, con peticiones sin servir
+
+		State.setOperatorsMode(1);
+		
+		System.out.println("##########\nEjercicio 8\n##########");
+		for (int i = 0; i < penalizations.length; ++i) {
+			State.setPenalizationTime(penalizations[i]);
+			System.out.println("Penalización: " + penalizations[i]);
+			totalTimeAvg  = 0;
+			execTime = 0;
+			unservedAvg = 0;
+			for (int j = 0; j < nTests; ++j) {
+				// El parámetro seed varía
+				State.setProblemParameters(nServers, nReplications, nUsers,
+						nRequestsUser, j);
+
+				// Generar el estado inicial (método generador greedy con
+				// peticiones sin servir)
+				d1 = new Date();
+				start = new State().greedyState();
+
+				// Usamos Hill Climbing
+				successorAlgorythm = new StateSuccessorFunctionHill();
+				search = new HillClimbingSearch();
+
+				// Primer criterio (minimización del servidor con más carga)
+				State.setHeuristicMode("stdev");
+				criteria = new StateHeuristicFunction2();
+				problem = new Problem(start, successorAlgorythm,
+						new StateGoalTest(), criteria);
+
+				d2 = new Date();
+
+				// Ejecutar
+				d1 = new Date();
+				try {
+					agent = new SearchAgent(problem, search);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d2 = new Date();
+				// Comparar heurísticas inicial y final
+				end = (State) search.getGoalState();
+
+				// Sumatorio de resultados de heurística y tiempos de ejecución
+				// para cada caso
+				totalTimeAvg += end.getTotalTime();
+				execTime += d2.getTime() - d1.getTime();
+				unservedAvg += end.getUnservedRequestsCount();
+			}
+			// Cálculos de media de heurística y tiempos de ejecución para cada
+			// caso usando el sumatorio
+			totalTimeAvg /= nTests;
+			execTime /= nTests;
+			unservedAvg /= nTests;
+
+			System.out.println("Tiempo medio de ejecución: " + execTime);
+			System.out.println("Tiempo total de carga medio: " + totalTimeAvg);
+			System.out.println("Cantidad media de peticiones sin servir: " + unservedAvg);
+
+			System.out.println("----------");
+		}
+	}
 	
 	
 }
