@@ -16,6 +16,7 @@ public class State {
 	private static boolean sAddOperator = false;
 	private static boolean sSwapOperator = false;
 	private static boolean sRemoveOperator = false;
+	private static int sOperatorsMode = -1;
 	private static String sHeuristicMode = "";
 	private static int sUsersCount = 0;
 	private static int sMaxUserRequests = 0;
@@ -143,17 +144,17 @@ public class State {
 		return mServersRequests[idServer].getTotalTime();
 	}
 
-	public static void setAddOperator(boolean b) {
-		sAddOperator = b;
-	}
-
-	public static void setSwapOperator(boolean b) {
-		sSwapOperator = b;
-	}
-
-	public static void setRemoveOperator(boolean b) {
-		sRemoveOperator = b;
-	}
+//	public static void setAddOperator(boolean b) {
+//		sAddOperator = b;
+//	}
+//
+//	public static void setSwapOperator(boolean b) {
+//		sSwapOperator = b;
+//	}
+//
+//	public static void setRemoveOperator(boolean b) {
+//		sRemoveOperator = b;
+//	}
 
 	public static void setHeuristicMode(String s) {
 		sHeuristicMode = new String(s);
@@ -168,6 +169,38 @@ public class State {
 		StateHeuristicFunction2 heuristicFunction2 = new StateHeuristicFunction2();
 		mHeuristic1 = heuristicFunction1.getHeuristicValue(this);
 		mHeuristic2 = heuristicFunction2.getHeuristicValue(this);
+	}
+	
+	public static void setOperatorsMode(int n){
+		if (n >= 0 && n < 4){
+			switch (n){
+			case 0:
+				sAddOperator = false;
+				sSwapOperator = true;
+				sRemoveOperator = false;
+				break;
+			case 1:
+				sAddOperator = false;
+				sSwapOperator = true;
+				sRemoveOperator = true;
+				break;
+			case 2:
+				sAddOperator = true;
+				sSwapOperator = false;
+				sRemoveOperator = true;
+				break;
+			case 3:
+				sAddOperator = true;
+				sSwapOperator = true;
+				sRemoveOperator = true;
+				break;
+			}
+			sOperatorsMode = n;
+		}
+	}
+	
+	public static int getOperatorsMode(){
+		return sOperatorsMode;
 	}
 
 	public State randomStateFullRequests(int seed) {
