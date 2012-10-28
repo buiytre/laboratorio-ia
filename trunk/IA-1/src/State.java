@@ -27,7 +27,7 @@ public class State {
 	private Link[] mServersRequests = null;
 	private int[] mRequestsServers = null;
 	private int mTotalTime = 0;
-	private int mTotalPenalizationTime = 0;
+	private int mUnservedRequest = 0;
 	private double mHeuristic1 = -1;
 	private double mHeuristic2 = -1;
 
@@ -58,7 +58,7 @@ public class State {
 			mRequestsServers[i] = -1;
 		}
 
-		mTotalPenalizationTime = sRequestsCount * sPenalization; // Se cuenta
+		mUnservedRequest = sRequestsCount; // Se cuenta
 																	// por
 																	// defecto
 																	// todas los
@@ -70,7 +70,7 @@ public class State {
 
 	public State(State oldState) {
 		mTotalTime = oldState.mTotalTime;
-		mTotalPenalizationTime = oldState.mTotalPenalizationTime;
+		mUnservedRequest = oldState.mUnservedRequest;
 		this.mServersRequests = oldState.mServersRequests.clone();
 		this.mRequestsServers = oldState.mRequestsServers.clone();
 		for (int i = 0; i < mServersRequests.length; ++i) {
@@ -97,10 +97,6 @@ public class State {
 
 	public static boolean getRemoveOperator() {
 		return sRemoveOperator;
-	}
-
-	public static void getServerPerRequest() {
-
 	}
 
 	public static int getServersCount() {
@@ -140,8 +136,12 @@ public class State {
 		return Math.sqrt(incr / (sServersCount - 1));
 	}
 
+	public int getUnservedRequestsCount(){
+		return mUnservedRequest;
+	}
+	
 	public int getTotalPenalizationTime() {
-		return mTotalPenalizationTime;
+		return mUnservedRequest*sPenalization;
 	}
 
 	public int getServerTime(int idServer) {
@@ -386,7 +386,7 @@ public class State {
 						sRequests.getRequest(idRequest)[0]));
 		mTotalTime += sServers.tranmissionTime(idServer,
 				sRequests.getRequest(idRequest)[0]);
-		mTotalPenalizationTime -= sPenalization;
+		mUnservedRequest -= 1;
 		// Recalculamos el heurístico
 		heuristicGen();
 	}
@@ -403,7 +403,7 @@ public class State {
 						sRequests.getRequest(idRequest)[0]));
 		mTotalTime += sServers.tranmissionTime(idServer,
 				sRequests.getRequest(idRequest)[0]);
-		mTotalPenalizationTime -= sPenalization;
+		mUnservedRequest -= 1;
 		// Recalculamos el heurístico
 		heuristicGen();
 	}
@@ -438,7 +438,7 @@ public class State {
 						sRequests.getRequest(idRequest)[0]));
 		mTotalTime -= sServers.tranmissionTime(oldServer,
 				sRequests.getRequest(idRequest)[0]);
-		mTotalPenalizationTime += sPenalization;
+		mUnservedRequest += 1;
 		// Recalculamos el heurístico
 		heuristicGen();
 	}
