@@ -35,30 +35,103 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 			for (int i = 0; i <= random; ++i) {
 				idServer = it.next();
 			}
-			//
-			switch (rdm.nextInt(2)) {
-			case 0:
-				if (State.getSwapOperator() && padre.canSwap(idServer, idRequest)) {
+			switch (State.getOperatorsMode()) {
+			case 0: // Swap
+				if (padre.canSwap(idServer, idRequest)) {
 					hijo = new State(padre);
 					hijo.swapOperator(idServer, idRequest);
-					str = str.concat("swap " + getSuccessorComment(hijo, idRequest));
-				} else if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
-					hijo = new State(padre);
-					hijo.removeOperator(idRequest);
-					str = str.concat("remove " + getSuccessorComment(hijo, idRequest));
+					str = str.concat("swap "
+							+ getSuccessorComment(hijo, idRequest));
 				}
 				break;
-			case 1:
-				if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
-					hijo = new State(padre);
-					hijo.removeOperator(idRequest);
-					str = str.concat("remove " + getSuccessorComment(hijo, idRequest));
-				} else if (State.getSwapOperator() && padre.canSwap(idServer, idRequest)) {
-					hijo = new State(padre);
-					hijo.swapOperator(idServer, idRequest);
-					str = str.concat("swap " + getSuccessorComment(hijo, idRequest));
+			case 1: // Swap+Del
+				switch (rdm.nextInt(2)) {
+				case 0:
+					if (padre.canSwap(idServer, idRequest)) {
+						hijo = new State(padre);
+						hijo.swapOperator(idServer, idRequest);
+						str = str.concat("swap "
+								+ getSuccessorComment(hijo, idRequest));
+					} else if (padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.removeOperator(idRequest);
+						str = str.concat("remove "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				case 1:
+					if (padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.removeOperator(idRequest);
+						str = str.concat("remove "
+								+ getSuccessorComment(hijo, idRequest));
+					} else if (padre.canSwap(idServer, idRequest)) {
+						hijo = new State(padre);
+						hijo.swapOperator(idServer, idRequest);
+						str = str.concat("swap "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
 				}
 				break;
+			case 2: // Add+Del
+				switch (rdm.nextInt(2)) {
+				case 0:
+					if (padre.canAdd(idServer, idRequest)) {
+						hijo = new State(padre);
+						hijo.addOperator(idServer, idRequest);
+						str = str.concat("add "
+								+ getSuccessorComment(hijo, idRequest));
+					} else if (padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.removeOperator(idRequest);
+						str = str.concat("remove "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				case 1:
+					if (padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.removeOperator(idRequest);
+						str = str.concat("remove "
+								+ getSuccessorComment(hijo, idRequest));
+					} else if (padre.canAdd(idServer, idRequest)) {
+						hijo = new State(padre);
+						hijo.addOperator(idServer, idRequest);
+						str = str.concat("add "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				}
+				break;
+			case 3: // Add+Swap+Del
+				switch (rdm.nextInt(3)) {
+				case 0:
+					if (State.getSwapOperator()
+							&& padre.canSwap(idServer, idRequest)) {
+						hijo = new State(padre);
+						hijo.swapOperator(idServer, idRequest);
+						str = str.concat("swap "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				case 1:
+					if (State.getRemoveOperator() && padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.removeOperator(idRequest);
+						str = str.concat("remove "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				case 2:
+					if (State.getAddOperator() && padre.canRemove(idRequest)) {
+						hijo = new State(padre);
+						hijo.addOperator(idServer, idRequest);
+						str = str.concat("add "
+								+ getSuccessorComment(hijo, idRequest));
+					}
+					break;
+				}
 			}
 		}
 		successor.add(new Successor(str, hijo));
