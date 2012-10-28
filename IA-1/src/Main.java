@@ -1,4 +1,5 @@
 import sun.management.Agent;
+import aima.search.framework.HeuristicFunction;
 import aima.search.framework.Metrics;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
@@ -12,7 +13,7 @@ import java.util.Date;
 public class Main {
 	public static void main(String args[]) {
 		experiment1();
-		experiment2();
+		//experiment2();
 	}
 
 	private static void experiment1() {
@@ -21,6 +22,7 @@ public class Main {
 		Search search = null;
 		Problem problem = null;
 		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
 		Date d1 = null;
 		Date d2 = null;
 
@@ -43,18 +45,21 @@ public class Main {
 			State.setOperatorsMode(i);
 			
 			for (int j = 0; j < nTests; ++j) {
-				System.out.println("Prueba 1:");
+				System.out.println("Prueba " + j + ":");
 				// El parámetro seed varía
 				State.setProblemParameters(nServers, nReplications, nUsers,
 						nRequestsUser, j);
 
-				// Generar el estado inicial (método generador greedy)
+				// Generar el estado inicial (método generador greedy con peticiones sin servir)
 				d1 = new Date();
-				start = new State().greedyStateFullRequests();
+				start = new State().greedyState();
 				
 				//Usamos Hill Climbing
 				successorAlgorythm = new StateSuccessorFunctionHill();
 				search = new HillClimbingSearch();
+				//Primer criterio (minimización del servidor con más carga)
+				criteria = new StateHeuristicFunction1();
+				problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
 				d2 = new Date();
 				System.out.println("Tiempo de generación: " + (d2.getTime() - d1.getTime()));
 
@@ -84,6 +89,7 @@ public class Main {
 		Search search = null;
 		Problem problem = null;
 		SuccessorFunction successorAlgorythm = null;
+		HeuristicFunction criteria = null;
 		Date d1 = null;
 		Date d2 = null;
 
@@ -104,7 +110,7 @@ public class Main {
 		for (int i = 0; i < generatorFunc.length; ++i) {
 			System.out.println("Función generadora: " + generatorFunc[i] + "\n##########");
 			for (int j = 0; j < nTests; ++j) {
-				System.out.println("Prueba 1:");
+				System.out.println("Prueba " + j + ":");
 				// El parámetro seed varía
 				State.setProblemParameters(nServers, nReplications, nUsers,
 						nRequestsUser, j);
@@ -122,6 +128,9 @@ public class Main {
 				//Usamos Hill Climbing
 				successorAlgorythm = new StateSuccessorFunctionHill();
 				search = new HillClimbingSearch();
+				//Primer criterio (minimización del servidor con más carga)
+				criteria = new StateHeuristicFunction1();
+				problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
 				d2 = new Date();
 				System.out.println("Tiempo de generación: "
 						+ (d2.getTime() - d1.getTime()));
