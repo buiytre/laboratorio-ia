@@ -144,18 +144,6 @@ public class State {
 		return mServersRequests[idServer].getTotalTime();
 	}
 
-//	public static void setAddOperator(boolean b) {
-//		sAddOperator = b;
-//	}
-//
-//	public static void setSwapOperator(boolean b) {
-//		sSwapOperator = b;
-//	}
-//
-//	public static void setRemoveOperator(boolean b) {
-//		sRemoveOperator = b;
-//	}
-
 	public static void setHeuristicMode(String s) {
 		sHeuristicMode = new String(s);
 	}

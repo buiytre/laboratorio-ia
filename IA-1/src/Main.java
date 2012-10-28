@@ -12,17 +12,19 @@ import java.util.Date;
 @SuppressWarnings("unused")
 public class Main {
 	public static void main(String args[]) {
-		experiment1();
+		experiment1(1);
 		//experiment2();
 	}
 
-	private static void experiment1() {
+	private static void experiment1(int nTests) {
 		State start = null;
 		State end = null;
 		Search search = null;
 		Problem problem = null;
 		SuccessorFunction successorAlgorythm = null;
 		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+		
 		Date d1 = null;
 		Date d2 = null;
 
@@ -33,14 +35,15 @@ public class Main {
 		int seed = 10;
 		String[] operatorsMode = { "Modo 0", "Modo 1", "Modo 2", "Modo 3" };
 
-		int nTests = 10;
-		
 		// Establecer los parámetros del problema
+		//Primer criterio, con peticiones sin servir
 		State.setHeuristicMode("max");
+		criteria = new StateHeuristicFunction1();
+		State.setPenalizationTime(2500);
 		
-		System.out.println("\n##########Ejercicio 1\n##########");
+		System.out.println("##########\nEjercicio 1\n##########");
 		for (int i = 0; i < operatorsMode.length; ++i) {
-			System.out.println("Modo operadores: " + operatorsMode[i] + "\n##########");
+			System.out.println("##########\nModo operadores: " + operatorsMode[i] + "\n##########");
 			//El conjunto de operadores varía
 			State.setOperatorsMode(i);
 			
@@ -58,7 +61,6 @@ public class Main {
 				successorAlgorythm = new StateSuccessorFunctionHill();
 				search = new HillClimbingSearch();
 				//Primer criterio (minimización del servidor con más carga)
-				criteria = new StateHeuristicFunction1();
 				problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
 				d2 = new Date();
 				System.out.println("Tiempo de generación: " + (d2.getTime() - d1.getTime()));
@@ -66,14 +68,14 @@ public class Main {
 				// Ejecutar
 				d1 = new Date();
 				try {
-					SearchAgent agent = new SearchAgent(problem, search);
+					agent = new SearchAgent(problem, search);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				d2 = new Date();
 				System.out.println("Tiempo de ejecución: "
 						+ (d2.getTime() - d1.getTime()));
-
+				System.out.println("Iteraciones: " + search.getMetrics().getInt("nodesExpanded"));
 				// Comparar heurísticas inicial y final
 				end = (State) search.getGoalState();
 				System.out.println("Heurística inicial: "
@@ -83,13 +85,15 @@ public class Main {
 		}
 	}
 	
-	private static void experiment2() {
+	private static void experiment2(int nTests) {
 		State start = null;
 		State end = null;
 		Search search = null;
 		Problem problem = null;
 		SuccessorFunction successorAlgorythm = null;
 		HeuristicFunction criteria = null;
+		SearchAgent agent = null;
+		
 		Date d1 = null;
 		Date d2 = null;
 
@@ -100,13 +104,12 @@ public class Main {
 		int seed = 10;
 		String[] generatorFunc = { "Random", "Greedy" };
 
-		int nTests = 10;
-		
 		// Establecer los parámetros del problema
 		State.setHeuristicMode("max");
+		criteria = new StateHeuristicFunction1();
 		State.setOperatorsMode(0);
 		
-		System.out.println("\n##########Ejercicio 2\n##########");
+		System.out.println("##########\nEjercicio 2\n##########");
 		for (int i = 0; i < generatorFunc.length; ++i) {
 			System.out.println("Función generadora: " + generatorFunc[i] + "\n##########");
 			for (int j = 0; j < nTests; ++j) {
@@ -129,22 +132,22 @@ public class Main {
 				successorAlgorythm = new StateSuccessorFunctionHill();
 				search = new HillClimbingSearch();
 				//Primer criterio (minimización del servidor con más carga)
-				criteria = new StateHeuristicFunction1();
 				problem = new Problem(start, successorAlgorythm, new StateGoalTest(), criteria);
 				d2 = new Date();
 				System.out.println("Tiempo de generación: "
 						+ (d2.getTime() - d1.getTime()));
 
+				System.out.println("Iteraciones: " + agent.getInstrumentation().getProperty("Iterations"));
 				// Ejecutar
 				d1 = new Date();
 				try {
-					SearchAgent agent = new SearchAgent(problem, search);
+					agent = new SearchAgent(problem, search);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				d2 = new Date();
 				System.out.println("Tiempo de ejecución: " + (d2.getTime() - d1.getTime()));
-
+				System.out.println("Iteraciones: " + search.getMetrics().getInt("nodesExpanded"));				
 				// Comparar heurísticas inicial y final
 				end = (State) search.getGoalState();
 				System.out.println("Heurística inicial: "
