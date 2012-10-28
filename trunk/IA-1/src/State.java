@@ -127,6 +127,10 @@ public class State {
 		return (mTotalTime / sServersCount);
 	}
 
+	public int getTotalTime() {
+		return mTotalTime;
+	}
+	
 	public double getStDev() {
 		double avg = getAverage();
 		double incr = 0;
