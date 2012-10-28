@@ -107,7 +107,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 				break;
 			case 3: // Add+Swap+Del
 				switch (rdm.nextInt(3)) {
-				case 0:
+				case 0: //swap
 					if (padre.canSwap(idServer, idRequest)) {
 						hijo = new State(padre);
 						hijo.swapOperator(idServer, idRequest);
@@ -115,21 +115,58 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 								+ getSuccessorComment(hijo, idRequest));
 					}
 					break;
-				case 1:
+				case 1: //remove
 					if (padre.canRemove(idRequest)) {
 						hijo = new State(padre);
 						hijo.removeOperator(idRequest);
 						str = str.concat("remove "
 								+ getSuccessorComment(hijo, idRequest));
+					}else{
+						switch(rdm.nextInt(2)){
+						case 0:
+							if (padre.canSwap(idServer, idRequest)) {
+								hijo = new State(padre);
+								hijo.swapOperator(idServer, idRequest);
+								str = str.concat("swap "
+										+ getSuccessorComment(hijo, idRequest));
+							}
+							break;
+						case 1:
+							if (padre.canAdd(idServer, idRequest)) {
+								hijo = new State(padre);
+								hijo.addOperator(idServer, idRequest);
+								str = str.concat("add "
+										+ getSuccessorComment(hijo, idRequest));
+							}
+							break;
+						}
 					}
 					break;
-				case 2:
-					if (padre.canRemove(idRequest)) {
+				case 2://add
+					if (padre.canAdd(idServer, idRequest)) {
 						hijo = new State(padre);
 						hijo.addOperator(idServer, idRequest);
 						str = str.concat("add "
 								+ getSuccessorComment(hijo, idRequest));
-					}
+					}else{
+						switch(rdm.nextInt(2)){
+						case 0:
+							if (padre.canSwap(idServer, idRequest)) {
+								hijo = new State(padre);
+								hijo.swapOperator(idServer, idRequest);
+								str = str.concat("swap "
+										+ getSuccessorComment(hijo, idRequest));
+							}
+							break;
+						case 1:
+							if (padre.canAdd(idServer, idRequest)) {
+								hijo = new State(padre);
+								hijo.addOperator(idServer, idRequest);
+								str = str.concat("add "
+										+ getSuccessorComment(hijo, idRequest));
+							}
+							break;
+						}					}
 					break;
 				}
 			}
