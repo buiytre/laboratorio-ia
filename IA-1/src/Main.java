@@ -32,10 +32,10 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		experiment1(15);
-		// experiment2(1);
-		// experiment3(1);
-		//experiment4(1);
+		//experiment1(15);
+		//experiment2(15);
+		experiment3(15);
+		//experiment4(15);
 		//experiment5(1);
 		//experiment6(15);
 		//experiment7(1);
@@ -86,7 +86,7 @@ public class Main {
 			// Primer criterio, con peticiones sin servir
 			State.setHeuristicMode("stdev");
 			criteria = new StateHeuristicFunction2();
-			State.setPenalizationTime(5000);
+			State.setPenalizationTime(2500);
 
 			System.out.println("##########\nEjercicio 1\n##########");
 			for (int i = 0; i < operatorsMode.length; ++i) {
@@ -109,7 +109,7 @@ public class Main {
 					// Generar el estado inicial (método generador greedy con
 					// peticiones sin servir)
 					d1 = new Date();
-					start = new State().greedyStateFullRequests();
+					start = new State().greedyState();
 
 					// Usamos Hill Climbing
 					successorAlgorythm = new StateSuccessorFunctionHill();
@@ -188,10 +188,11 @@ public class Main {
 
 			// Establecer los parámetros del problema
 			// Criterio 1, sin peticiones sin servir
-			State.setHeuristicMode("max");
-			criteria = new StateHeuristicFunction1();
-			State.setOperatorsMode(0);
-
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
+			State.setOperatorsMode(1);
+			State.setPenalizationTime(2500);
+			
 			System.out.println("##########\nEjercicio 2\n##########");
 			for (int i = 0; i < generatorFunc.length; ++i) {
 				System.out.println("Función generadora: " + generatorFunc[i]
@@ -242,7 +243,7 @@ public class Main {
 					end = (State) search.getGoalState();
 					execTime += d2.getTime() - d1.getTime();
 					iterAvg += search.getMetrics().getInt("nodesExpanded");
-					heurAvg += end.getHeuristic1();
+					heurAvg += end.getHeuristic2();
 				}
 				creatTime /= nTests;
 				execTime /= nTests;
@@ -309,10 +310,6 @@ public class Main {
 			int k[] = { 10000, 1000, 100, 10 };
 			double lamb[] = { 0.0001, 0.001, 0.01, 0.1, 1 };
 
-			/*
-			 * int steps[] = {100000}; int stiter[] = {10000}; int k[] =
-			 * {10000}; double lamb[] = {0.0001};
-			 */
 			// Variables para calcular las medias de heurística y tiempo de
 			// ejecución
 			double climbingHeurAvg = 0;
@@ -328,10 +325,11 @@ public class Main {
 
 			// Establecer los parámetros del problema
 			// Primer criterio, sin peticiones sin servir
-			State.setHeuristicMode("max");
-			State.setOperatorsMode(0); // 0: Swap
-			criteria = new StateHeuristicFunction1();
-
+			State.setHeuristicMode("stdev");
+			State.setOperatorsMode(1); // 0: Swap
+			criteria = new StateHeuristicFunction2();
+			State.setPenalizationTime(2500);
+			
 			System.out.println("##########\nEjercicio 3\n##########");
 			System.out.println("");
 
@@ -346,7 +344,7 @@ public class Main {
 				// peticiones
 				// sin servir)
 				d1 = new Date();
-				start = new State().greedyStateFullRequests();
+				start = new State().greedyState();
 
 				// Usamos Hill Climbing
 				successorAlgorythm = new StateSuccessorFunctionHill();
@@ -364,7 +362,7 @@ public class Main {
 
 				d2 = new Date();
 				climbingExecTimeAvg += d2.getTime() - d1.getTime();
-				climbingHeurAvg += end.getHeuristic1();
+				climbingHeurAvg += end.getHeuristic2();
 			}
 			climbingExecTimeAvg /= nTests;
 			climbingHeurAvg /= nTests;
@@ -391,7 +389,7 @@ public class Main {
 								// Generar el estado inicial (método generador
 								// greedy sin peticiones sin servir)
 								d1 = new Date();
-								start = new State().greedyStateFullRequests();
+								start = new State().greedyState();
 
 								// Usamos Simulated Annealing
 								successorAlgorythm = new StateSuccessorFunctionSimulated();
