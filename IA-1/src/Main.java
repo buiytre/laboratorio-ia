@@ -34,10 +34,10 @@ public class Main {
 
 		//experiment1(15);
 		//experiment2(15);
-		experiment3(15);
+		//experiment3(15);
 		//experiment4(15);
-		//experiment5(1);
-		//experiment6(15);
+		//experiment5(15);
+		experiment6(15);
 		//experiment7(1);
 		// experiment8(1);
 		// experiment9(1);
@@ -190,7 +190,7 @@ public class Main {
 			// Criterio 1, sin peticiones sin servir
 			State.setHeuristicMode("stdev");
 			criteria = new StateHeuristicFunction2();
-			State.setOperatorsMode(1);
+			State.setOperatorsMode(0);
 			State.setPenalizationTime(2500);
 			
 			System.out.println("##########\nEjercicio 2\n##########");
@@ -326,7 +326,7 @@ public class Main {
 			// Establecer los parámetros del problema
 			// Primer criterio, sin peticiones sin servir
 			State.setHeuristicMode("stdev");
-			State.setOperatorsMode(1); // 0: Swap
+			State.setOperatorsMode(0); // 0: Swap
 			criteria = new StateHeuristicFunction2();
 			State.setPenalizationTime(2500);
 			
@@ -344,7 +344,7 @@ public class Main {
 				// peticiones
 				// sin servir)
 				d1 = new Date();
-				start = new State().greedyState();
+				start = new State().greedyStateFullRequests();
 
 				// Usamos Hill Climbing
 				successorAlgorythm = new StateSuccessorFunctionHill();
@@ -389,14 +389,14 @@ public class Main {
 								// Generar el estado inicial (método generador
 								// greedy sin peticiones sin servir)
 								d1 = new Date();
-								start = new State().greedyState();
+								start = new State().greedyStateFullRequests();
 
 								// Usamos Simulated Annealing
 								successorAlgorythm = new StateSuccessorFunctionSimulated();
 								search = new SimulatedAnnealingSearch(
 										steps[loopSteps], stiter[loopStiter],
 										k[loopK], lamb[loopLamb]);
-								criteria = new StateHeuristicFunction1();
+								criteria = new StateHeuristicFunction2();
 								problem = new Problem(start,
 										successorAlgorythm,
 										new StateGoalTest(), criteria);
@@ -410,17 +410,17 @@ public class Main {
 								end = (State) search.getGoalState();
 
 								// Desviaciones máximas y mínimas
-								if (climbingHeurAvg - end.getHeuristic1() > annealingMaxDev)
+								if (climbingHeurAvg - end.getHeuristic2() > annealingMaxDev)
 									annealingMaxDev = climbingHeurAvg
-											- end.getHeuristic1();
-								if (climbingHeurAvg - end.getHeuristic1() < annealingMinDev)
+											- end.getHeuristic2();
+								if (climbingHeurAvg - end.getHeuristic2() < annealingMinDev)
 									annealingMinDev = climbingHeurAvg
-											- end.getHeuristic1();
+											- end.getHeuristic2();
 
 								// Sumatorio de resultados de heurística y
 								// tiempos
 								// de ejecución para cada caso
-								annealingHeurAvg += end.getHeuristic1();
+								annealingHeurAvg += end.getHeuristic2();
 								execTime += d2.getTime() - d1.getTime();
 							}
 							// Cálculos de media de heurística y tiempos de
@@ -500,8 +500,8 @@ public class Main {
 			int seed = 10;
 
 			// Establecer los parámetros del problema
-			State.setHeuristicMode("max");
-			criteria = new StateHeuristicFunction1();
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
 			State.setOperatorsMode(0);
 
 			System.out.println("##########\nEjercicio 4\n##########");
@@ -541,7 +541,7 @@ public class Main {
 					// Sumatorio de resultados de heurística y tiempos de
 					// ejecución
 					// para cada caso
-					heurAvg += end.getHeuristic1();
+					heurAvg += end.getHeuristic2();
 					execTime += d2.getTime() - d1.getTime();
 				}
 				// Cálculos de media de heurística y tiempos de ejecución para
@@ -606,7 +606,7 @@ public class Main {
 					// Sumatorio de resultados de heurística y tiempos de
 					// ejecución
 					// para cada caso
-					heurAvg += end.getHeuristic1();
+					heurAvg += end.getHeuristic2();
 					execTime += d2.getTime() - d1.getTime();
 				}
 				// Cálculos de media de heurística y tiempos de ejecución para
@@ -879,7 +879,7 @@ public class Main {
 			// Parámetros de Simulated Annealing
 			// TODO: Generar
 			int steps=100000;
-			int stiter=1000;
+			int stiter=1;
 			int k=10;
 			double lamb=0.001;
 			
@@ -1000,6 +1000,73 @@ public class Main {
 			sheet.addCell(number);
 			number = new Number(0, 1, totalTimeAvg);
 			sheet.addCell(number);
+			
+			State.setOperatorsMode(0);
+			totalTimeAvg = 0;
+			execTime = 0;
+			for (int i = 0; i < penalizations.length; ++i) {
+				State.setPenalizationTime(penalizations[i]);
+				System.out.println("Penalización: " + penalizations[i]);
+				totalTimeAvg = 0;
+				execTime = 0;
+				for (int j = 0; j < nTests; ++j) {
+					// El parámetro seed varía
+					State.setProblemParameters(nServers, nReplications, nUsers,
+							nRequestsUser, j);
+
+					// Generar el estado inicial (método generador greedy con
+					// peticiones sin servir)
+					d1 = new Date();
+					start = new State().greedyStateFullRequests();
+
+					// Usamos Simulated Annealing
+					successorAlgorythm = new StateSuccessorFunctionSimulated();
+					search = new SimulatedAnnealingSearch(steps, stiter, k,
+							lamb);
+
+					// Primer criterio (minimización del servidor con más carga)
+					State.setHeuristicMode("stdev");
+					criteria = new StateHeuristicFunction2();
+					problem = new Problem(start, successorAlgorythm,
+							new StateGoalTest(), criteria);
+
+					d2 = new Date();
+
+					// Ejecutar
+					d1 = new Date();
+					try {
+						agent = new SearchAgent(problem, search);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					d2 = new Date();
+					// Comparar heurísticas inicial y final
+					end = (State) search.getGoalState();
+
+					// Sumatorio de resultados de heurística y tiempos de
+					// ejecución
+					// para cada caso
+					totalTimeAvg += end.getTotalTime();
+					execTime += d2.getTime() - d1.getTime();
+				}
+				// Cálculos de media de heurística y tiempos de ejecución para
+				// cada
+				// caso usando el sumatorio
+				totalTimeAvg /= nTests;
+				execTime /= nTests;
+
+				System.out.println("Tiempo medio de ejecución: " + execTime);
+				System.out.println("Tiempo total de carga medio: "
+						+ totalTimeAvg);
+				System.out.println("----------");
+				number = new Number(2, i + 1, execTime);
+				sheet.addCell(number);
+				number = new Number(1, i + 1, totalTimeAvg);
+				sheet.addCell(number);
+				number = new Number(0, i + 1, penalizations[i]);
+				sheet.addCell(number);
+			}
+			
 			State.setOperatorsMode(1);
 			System.out
 					.println("Simulated Annealing, Heurística 2 con soluciones sin servir");
