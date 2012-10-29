@@ -38,7 +38,7 @@ public class Main {
 		//experiment4(15);
 		//experiment5(15);
 		experiment6(15);
-		//experiment7(1);
+		//experiment7(15);
 		// experiment8(1);
 		// experiment9(1);
 		try {
@@ -877,7 +877,6 @@ public class Main {
 			int seed = 10;
 
 			// Parámetros de Simulated Annealing
-			// TODO: Generar
 			int steps=100000;
 			int stiter=1;
 			int k=10;
