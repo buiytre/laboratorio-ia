@@ -32,13 +32,13 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		// experiment1(3);
+		experiment1(15);
 		// experiment2(1);
 		// experiment3(1);
-		experiment4(1);
-		// experiment5(1);
-		// experiment6(1);
-		// experiment7(1);
+		//experiment4(1);
+		//experiment5(1);
+		//experiment6(15);
+		//experiment7(1);
 		// experiment8(1);
 		// experiment9(1);
 		try {
@@ -84,8 +84,8 @@ public class Main {
 
 			// Establecer los parámetros del problema
 			// Primer criterio, con peticiones sin servir
-			State.setHeuristicMode("max");
-			criteria = new StateHeuristicFunction1();
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
 			State.setPenalizationTime(5000);
 
 			System.out.println("##########\nEjercicio 1\n##########");
@@ -109,7 +109,7 @@ public class Main {
 					// Generar el estado inicial (método generador greedy con
 					// peticiones sin servir)
 					d1 = new Date();
-					start = new State().randomState(j);
+					start = new State().greedyStateFullRequests();
 
 					// Usamos Hill Climbing
 					successorAlgorythm = new StateSuccessorFunctionHill();
@@ -373,6 +373,7 @@ public class Main {
 
 			// Simulated Annealing
 			System.out.println("Simulated annealing");
+						
 			for (int loopSteps = 0; loopSteps < steps.length; ++loopSteps) {
 				for (int loopStiter = 0; loopStiter < stiter.length; ++loopStiter) {
 					for (int loopK = 0; loopK < k.length; ++loopK) {
@@ -397,7 +398,7 @@ public class Main {
 								search = new SimulatedAnnealingSearch(
 										steps[loopSteps], stiter[loopStiter],
 										k[loopK], lamb[loopLamb]);
-
+								criteria = new StateHeuristicFunction1();
 								problem = new Problem(start,
 										successorAlgorythm,
 										new StateGoalTest(), criteria);
@@ -879,11 +880,14 @@ public class Main {
 
 			// Parámetros de Simulated Annealing
 			// TODO: Generar
-			int steps = 0;
-			int stiter = 0;
-			int k = 0;
-			double lamb = 0;
-
+			int steps=100000;
+			int stiter=1000;
+			int k=10;
+			double lamb=0.001;
+			
+					
+					
+					
 			int penalizations[] = { 5000, 4000, 3000, 2000, 1000, 500, 0 };
 
 			// Establecer los parámetros del problema
