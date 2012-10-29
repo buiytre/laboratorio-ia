@@ -365,13 +365,11 @@ public class State {
 				.contains(idServer)) {
 			return false;
 		}
-		// Comprobar que no hagamos swap sobre nosotros mismos
-		if (mRequestsServers[idRequest] == idServer) {
+		// Comprobar que estemos asignados
+		if (mRequestsServers[idRequest] != -1) {
 			return false;
 		}
 
-		if (!canRemove(idRequest))
-			return false;
 		return true;
 
 	}
