@@ -18,8 +18,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 		Servers totalServers = State.getServers();
 		State padre = (State) arg0;
 		State hijo = null;
-		Date date = new Date();
-		Random rdm = new Random(date.getTime());
+		Random rdm = new Random(new Date().getTime());
 		int random = -1;
 		ArrayList<Successor> successor = new ArrayList<Successor>();
 		Iterator<Integer> it = null;
@@ -53,12 +52,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 						hijo.swapOperator(idServer, idRequest);
 						str = str.concat("swap "
 								+ getSuccessorComment(hijo, idRequest));
-					} else if (padre.canRemove(idRequest)) {
-						hijo = new State(padre);
-						hijo.removeOperator(idRequest);
-						str = str.concat("remove "
-								+ getSuccessorComment(hijo, idRequest));
-					}
+					} 
 					break;
 				case 1:
 					if (padre.canRemove(idRequest)) {
@@ -66,12 +60,7 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 						hijo.removeOperator(idRequest);
 						str = str.concat("remove "
 								+ getSuccessorComment(hijo, idRequest));
-					} else if (padre.canSwap(idServer, idRequest)) {
-						hijo = new State(padre);
-						hijo.swapOperator(idServer, idRequest);
-						str = str.concat("swap "
-								+ getSuccessorComment(hijo, idRequest));
-					}
+					} 
 					break;
 				}
 				break;
@@ -83,23 +72,13 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 						hijo.addOperator(idServer, idRequest);
 						str = str.concat("add "
 								+ getSuccessorComment(hijo, idRequest));
-					} else if (padre.canRemove(idRequest)) {
-						hijo = new State(padre);
-						hijo.removeOperator(idRequest);
-						str = str.concat("remove "
-								+ getSuccessorComment(hijo, idRequest));
-					}
+					} 
 					break;
 				case 1:
 					if (padre.canRemove(idRequest)) {
 						hijo = new State(padre);
 						hijo.removeOperator(idRequest);
 						str = str.concat("remove "
-								+ getSuccessorComment(hijo, idRequest));
-					} else if (padre.canAdd(idServer, idRequest)) {
-						hijo = new State(padre);
-						hijo.addOperator(idServer, idRequest);
-						str = str.concat("add "
 								+ getSuccessorComment(hijo, idRequest));
 					}
 					break;
@@ -121,25 +100,6 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 						hijo.removeOperator(idRequest);
 						str = str.concat("remove "
 								+ getSuccessorComment(hijo, idRequest));
-					}else{
-						switch(rdm.nextInt(2)){
-						case 0:
-							if (padre.canSwap(idServer, idRequest)) {
-								hijo = new State(padre);
-								hijo.swapOperator(idServer, idRequest);
-								str = str.concat("swap "
-										+ getSuccessorComment(hijo, idRequest));
-							}
-							break;
-						case 1:
-							if (padre.canAdd(idServer, idRequest)) {
-								hijo = new State(padre);
-								hijo.addOperator(idServer, idRequest);
-								str = str.concat("add "
-										+ getSuccessorComment(hijo, idRequest));
-							}
-							break;
-						}
 					}
 					break;
 				case 2://add
@@ -148,27 +108,10 @@ public class StateSuccessorFunctionSimulated implements SuccessorFunction {
 						hijo.addOperator(idServer, idRequest);
 						str = str.concat("add "
 								+ getSuccessorComment(hijo, idRequest));
-					}else{
-						switch(rdm.nextInt(2)){
-						case 0:
-							if (padre.canSwap(idServer, idRequest)) {
-								hijo = new State(padre);
-								hijo.swapOperator(idServer, idRequest);
-								str = str.concat("swap "
-										+ getSuccessorComment(hijo, idRequest));
-							}
-							break;
-						case 1:
-							if (padre.canAdd(idServer, idRequest)) {
-								hijo = new State(padre);
-								hijo.addOperator(idServer, idRequest);
-								str = str.concat("add "
-										+ getSuccessorComment(hijo, idRequest));
-							}
-							break;
-						}					}
+					}
 					break;
 				}
+				break;
 			}
 		}
 		successor.add(new Successor(str, hijo));
