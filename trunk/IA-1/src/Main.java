@@ -37,10 +37,10 @@ public class Main {
 		//experiment3(15);
 		//experiment4(15);
 		//experiment5(15);
-		experiment6(15);
+		//experiment6(15);
 		//experiment7(15);
 		// experiment8(1);
-		// experiment9(1);
+		 experiment9(15);
 		try {
 			workbook.write();
 			workbook.close();
@@ -1418,9 +1418,10 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-
+/*
 	private static void experiment9(int nTests) {
 		try {
+
 			WritableSheet sheet = workbook.createSheet("Experimento 9", 14);
 			label = new Label(0, 0, "Num Peticiones");
 			sheet.addCell(label);
@@ -1512,4 +1513,102 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+	*/
+	private static void experiment9(int nTests) {
+		try {
+			WritableSheet sheet = workbook.createSheet("Experimento 9", 14);
+			label = new Label(0, 0, "Num Usuarios");
+			sheet.addCell(label);
+			label = new Label(1, 0, "Tiempo ejecucion");
+			sheet.addCell(label);
+			label = new Label(2, 0, "Heuristica Media");
+			sheet.addCell(label);
+			State start = null;
+			State end = null;
+			Search search = null;
+			Problem problem = null;
+			SuccessorFunction successorAlgorythm = null;
+			HeuristicFunction criteria = null;
+			SearchAgent agent = null;
+
+			Date d1 = null;
+			Date d2 = null;
+			long execTime = 0;
+			long heurAvg = 0;
+
+			int nServers = 50;
+			int nReplications = 5;
+			int nUsers = 200;
+			int nRequestsUser = 5;
+			int seed = 10;
+
+			// Establecer los parámetros del problema
+			State.setHeuristicMode("stdev");
+			criteria = new StateHeuristicFunction2();
+			State.setOperatorsMode(1);
+
+			System.out.println("##########\nEjercicio 9\n##########");
+			System.out.println("##########\nIncremento de usuarios");
+			nServers = 5;
+			nReplications = 2;
+			for (nUsers = 100; nUsers <= 500; nUsers += 100) {
+				System.out.println("Número de usuarios: " + nUsers);
+
+				heurAvg = 0;
+				execTime = 0;
+				for (int j = 0; j < nTests; ++j) {
+					// El parámetro seed varía
+					State.setProblemParameters(nServers, nReplications, nUsers,
+							nRequestsUser, j);
+					State.setPenalizationTime(2500);
+
+
+					// Generar el estado inicial (método generador
+					// greedy sin peticiones sin servir)
+					d1 = new Date();
+					start = new State().greedyState();
+
+					// Usamos Hill Climbing
+					successorAlgorythm = new StateSuccessorFunctionHill();
+					search = new HillClimbingSearch();
+
+					problem = new Problem(start, successorAlgorythm,
+							new StateGoalTest(), criteria);
+
+					try {
+						agent = new SearchAgent(problem, search);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					d2 = new Date();
+					end = (State) search.getGoalState();
+
+					// Sumatorio de resultados de heurística y tiempos de
+					// ejecución
+					// para cada caso
+					heurAvg += end.getHeuristic2();
+					execTime += d2.getTime() - d1.getTime();
+				}
+				// Cálculos de media de heurística y tiempos de ejecución para
+				// cada
+				// caso usando el sumatorio
+				heurAvg /= nTests;
+				execTime /= nTests;
+
+				System.out.println("Tiempo de ejecución: " + execTime);
+				System.out.println("Heurística media: " + heurAvg);
+				System.out.println("----------");
+				number = new Number(0, nUsers / 100 + 1, nUsers);
+				sheet.addCell(number);
+				number = new Number(1, nUsers / 100 + 1, execTime);
+				sheet.addCell(number);
+				number = new Number(2, nUsers / 100 + 1, heurAvg);
+				sheet.addCell(number);
+
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 }
