@@ -32,15 +32,15 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		//experiment1(15);
-		//experiment2(15);
-		//experiment3(15);
-		//experiment4(15);
-		//experiment5(15);
-		//experiment6(15);
-		//experiment7(15);
-		// experiment8(1);
-		 experiment9(15);
+		experiment1(15);
+		experiment2(15);
+		experiment3(15);
+		experiment4(15);
+		experiment5(15);
+		experiment6(15);
+		experiment7(15);
+		experiment8(15);
+		experiment9(15);
 		try {
 			workbook.write();
 			workbook.close();
